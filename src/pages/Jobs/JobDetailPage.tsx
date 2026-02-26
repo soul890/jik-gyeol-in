@@ -1,8 +1,8 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowLeft, MapPin, Clock, Eye, User, MessageCircle, Send, X } from 'lucide-react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { jobs } from '@/data/jobs';
+import { doc, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { jobs as staticJobs } from '@/data/jobs';
 import { categories } from '@/data/categories';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -10,15 +10,40 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { db } from '@/lib/firebase';
 import { formatDate } from '@/utils/format';
+import type { Job } from '@/types';
 
 export function JobDetailPage() {
   const { id } = useParams();
-  const job = jobs.find((j) => j.id === id);
+  const [job, setJob] = useState<Job | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [showInquiryModal, setShowInquiryModal] = useState(false);
   const [inquiryForm, setInquiryForm] = useState({ name: '', phone: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    const staticMatch = staticJobs.find((j) => j.id === id);
+    if (staticMatch) {
+      setJob(staticMatch);
+      setLoading(false);
+      return;
+    }
+
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    getDoc(doc(db, 'jobs', id))
+      .then((snap) => {
+        if (snap.exists()) {
+          setJob({ id: snap.id, ...snap.data() } as Job);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [id]);
 
   const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +71,14 @@ export function JobDetailPage() {
     setInquiryForm({ name: '', phone: '', message: '' });
     setSubmitted(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!job) {
     return (

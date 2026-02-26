@@ -1,9 +1,33 @@
-import { jobs } from '@/data/jobs';
+import { useState, useEffect, useMemo } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { jobs as staticJobs } from '@/data/jobs';
 import { JobCard } from '@/components/common/JobCard';
 import { SectionHeader } from '@/components/common/SectionHeader';
+import { db } from '@/lib/firebase';
+import type { Job } from '@/types';
 
 export function LatestJobs() {
-  const latestJobs = jobs.slice(0, 3);
+  const [firestoreJobs, setFirestoreJobs] = useState<Job[]>([]);
+
+  useEffect(() => {
+    getDocs(collection(db, 'jobs'))
+      .then((snapshot) => {
+        const docs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Job[];
+        setFirestoreJobs(docs);
+      })
+      .catch(() => {});
+  }, []);
+
+  const latestJobs = useMemo(() => {
+    const firestoreIds = new Set(firestoreJobs.map((d) => d.id));
+    const uniqueStatic = staticJobs.filter((d) => !firestoreIds.has(d.id));
+    return [...firestoreJobs, ...uniqueStatic]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 3);
+  }, [firestoreJobs]);
 
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14">

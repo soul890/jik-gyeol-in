@@ -1,11 +1,14 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowLeft, Eye, ThumbsUp, MessageCircle, User, X } from 'lucide-react';
-import { communityPosts } from '@/data/communityPosts';
+import { doc, getDoc } from 'firebase/firestore';
+import { communityPosts as staticPosts } from '@/data/communityPosts';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
+import { db } from '@/lib/firebase';
 import { formatDate } from '@/utils/format';
+import type { CommunityPost } from '@/types';
 
 const categoryVariant: Record<string, 'primary' | 'accent' | 'default'> = {
   '시공노하우': 'primary',
@@ -15,8 +18,40 @@ const categoryVariant: Record<string, 'primary' | 'accent' | 'default'> = {
 
 export function PostDetailPage() {
   const { id } = useParams();
-  const post = communityPosts.find((p) => p.id === id);
+  const [post, setPost] = useState<CommunityPost | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const staticMatch = staticPosts.find((p) => p.id === id);
+    if (staticMatch) {
+      setPost(staticMatch);
+      setLoading(false);
+      return;
+    }
+
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
+    getDoc(doc(db, 'communityPosts', id))
+      .then((snap) => {
+        if (snap.exists()) {
+          setPost({ id: snap.id, ...snap.data() } as CommunityPost);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!post) {
     return (

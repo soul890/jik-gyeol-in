@@ -1,24 +1,46 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { suppliers } from '@/data/suppliers';
+import { collection, getDocs } from 'firebase/firestore';
+import { suppliers as staticSuppliers } from '@/data/suppliers';
 import { SupplierCard } from '@/components/common/SupplierCard';
 import { CategoryFilter } from '@/components/common/CategoryFilter';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { db } from '@/lib/firebase';
+import type { Supplier } from '@/types';
 
 export function SupplierListPage() {
   const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
+  const [firestoreSuppliers, setFirestoreSuppliers] = useState<Supplier[]>([]);
+
+  useEffect(() => {
+    getDocs(collection(db, 'suppliers'))
+      .then((snapshot) => {
+        const docs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Supplier[];
+        setFirestoreSuppliers(docs);
+      })
+      .catch(() => {});
+  }, []);
+
+  const allSuppliers = useMemo(() => {
+    const firestoreIds = new Set(firestoreSuppliers.map((d) => d.id));
+    const uniqueStatic = staticSuppliers.filter((d) => !firestoreIds.has(d.id));
+    return [...firestoreSuppliers, ...uniqueStatic];
+  }, [firestoreSuppliers]);
 
   const filtered = useMemo(() => {
-    return suppliers.filter((s) => {
+    return allSuppliers.filter((s) => {
       if (category !== 'all' && !s.categories.includes(category)) return false;
       if (search && !s.name.includes(search) && !s.products.some((p) => p.includes(search))) return false;
       return true;
     });
-  }, [category, search]);
+  }, [allSuppliers, category, search]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">

@@ -1,9 +1,33 @@
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { communityPosts } from '@/data/communityPosts';
+import { collection, getDocs } from 'firebase/firestore';
+import { communityPosts as staticPosts } from '@/data/communityPosts';
 import { SectionHeader } from '@/components/common/SectionHeader';
+import { db } from '@/lib/firebase';
+import type { CommunityPost } from '@/types';
 
 export function RecentCommunity() {
-  const recentPosts = communityPosts.slice(0, 3);
+  const [firestorePosts, setFirestorePosts] = useState<CommunityPost[]>([]);
+
+  useEffect(() => {
+    getDocs(collection(db, 'communityPosts'))
+      .then((snapshot) => {
+        const docs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as CommunityPost[];
+        setFirestorePosts(docs);
+      })
+      .catch(() => {});
+  }, []);
+
+  const recentPosts = useMemo(() => {
+    const firestoreIds = new Set(firestorePosts.map((d) => d.id));
+    const uniqueStatic = staticPosts.filter((d) => !firestoreIds.has(d.id));
+    return [...firestorePosts, ...uniqueStatic]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 3);
+  }, [firestorePosts]);
 
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14">

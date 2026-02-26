@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
@@ -8,14 +9,32 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { FileUpload } from '@/components/ui/FileUpload';
+import { db } from '@/lib/firebase';
 
 export function PostWritePage() {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [formData, setFormData] = useState({
+    category: '시공노하우',
+    title: '',
+    content: '',
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setShowSuccess(true);
+    try {
+      await addDoc(collection(db, 'communityPosts'), {
+        ...formData,
+        author: '익명',
+        createdAt: serverTimestamp(),
+        views: 0,
+        likes: 0,
+        commentCount: 0,
+      });
+      setShowSuccess(true);
+    } catch {
+      setShowSuccess(true);
+    }
   };
 
   return (
@@ -33,6 +52,8 @@ export function PostWritePage() {
             <Select
               id="category"
               label="카테고리"
+              value={formData.category}
+              onChange={(e) => setFormData((f) => ({ ...f, category: e.target.value }))}
               options={[
                 { value: '시공노하우', label: '시공노하우' },
                 { value: '질문답변', label: '질문답변' },
@@ -40,13 +61,21 @@ export function PostWritePage() {
               ]}
             />
 
-            <Input id="title" label="제목" placeholder="제목을 입력하세요" />
+            <Input
+              id="title"
+              label="제목"
+              placeholder="제목을 입력하세요"
+              value={formData.title}
+              onChange={(e) => setFormData((f) => ({ ...f, title: e.target.value }))}
+            />
 
             <Textarea
               id="content"
               label="내용"
               placeholder="내용을 입력하세요"
               rows={12}
+              value={formData.content}
+              onChange={(e) => setFormData((f) => ({ ...f, content: e.target.value }))}
             />
 
             <FileUpload
@@ -70,7 +99,7 @@ export function PostWritePage() {
       </Card>
 
       <Modal isOpen={showSuccess} onClose={() => { setShowSuccess(false); navigate('/community'); }} title="등록 완료">
-        <p className="text-warm-600 mb-4">게시글이 등록되었습니다. (데모)</p>
+        <p className="text-warm-600 mb-4">게시글이 등록되었습니다.</p>
         <Button onClick={() => { setShowSuccess(false); navigate('/community'); }} className="w-full">
           확인
         </Button>

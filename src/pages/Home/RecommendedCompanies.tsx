@@ -1,11 +1,33 @@
-import { companies } from '@/data/companies';
+import { useState, useEffect, useMemo } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { companies as staticCompanies } from '@/data/companies';
 import { CompanyCard } from '@/components/common/CompanyCard';
 import { SectionHeader } from '@/components/common/SectionHeader';
+import { db } from '@/lib/firebase';
+import type { Company } from '@/types';
 
 export function RecommendedCompanies() {
-  const topCompanies = [...companies]
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 3);
+  const [firestoreCompanies, setFirestoreCompanies] = useState<Company[]>([]);
+
+  useEffect(() => {
+    getDocs(collection(db, 'companies'))
+      .then((snapshot) => {
+        const docs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Company[];
+        setFirestoreCompanies(docs);
+      })
+      .catch(() => {});
+  }, []);
+
+  const topCompanies = useMemo(() => {
+    const firestoreIds = new Set(firestoreCompanies.map((d) => d.id));
+    const uniqueStatic = staticCompanies.filter((d) => !firestoreIds.has(d.id));
+    return [...firestoreCompanies, ...uniqueStatic]
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 3);
+  }, [firestoreCompanies]);
 
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14">

@@ -31,7 +31,9 @@ export function CompanyListPage() {
   }, []);
 
   const allCompanies = useMemo(() => {
-    return [...staticCompanies, ...firestoreCompanies];
+    const firestoreIds = new Set(firestoreCompanies.map((d) => d.id));
+    const uniqueStatic = staticCompanies.filter((d) => !firestoreIds.has(d.id));
+    return [...firestoreCompanies, ...uniqueStatic];
   }, [firestoreCompanies]);
 
   const filtered = useMemo(() => {

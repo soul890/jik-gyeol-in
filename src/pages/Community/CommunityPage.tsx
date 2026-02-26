@@ -1,13 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PenSquare } from 'lucide-react';
-import { communityPosts } from '@/data/communityPosts';
+import { collection, getDocs } from 'firebase/firestore';
+import { communityPosts as staticPosts } from '@/data/communityPosts';
 import { CommunityPostCard } from '@/components/common/CommunityPostCard';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { Tabs } from '@/components/ui/Tabs';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
-import type { CommunityCategory } from '@/types';
+import { db } from '@/lib/firebase';
+import type { CommunityCategory, CommunityPost } from '@/types';
 
 const communityTabs = [
   { id: 'all', label: '전체' },
@@ -19,14 +21,33 @@ const communityTabs = [
 export function CommunityPage() {
   const [tab, setTab] = useState('all');
   const [search, setSearch] = useState('');
+  const [firestorePosts, setFirestorePosts] = useState<CommunityPost[]>([]);
+
+  useEffect(() => {
+    getDocs(collection(db, 'communityPosts'))
+      .then((snapshot) => {
+        const docs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as CommunityPost[];
+        setFirestorePosts(docs);
+      })
+      .catch(() => {});
+  }, []);
+
+  const allPosts = useMemo(() => {
+    const firestoreIds = new Set(firestorePosts.map((d) => d.id));
+    const uniqueStatic = staticPosts.filter((d) => !firestoreIds.has(d.id));
+    return [...firestorePosts, ...uniqueStatic];
+  }, [firestorePosts]);
 
   const filtered = useMemo(() => {
-    return communityPosts.filter((post) => {
+    return allPosts.filter((post) => {
       if (tab !== 'all' && post.category !== (tab as CommunityCategory)) return false;
       if (search && !post.title.includes(search) && !post.content.includes(search)) return false;
       return true;
     });
-  }, [tab, search]);
+  }, [allPosts, tab, search]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">

@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { jobs } from '@/data/jobs';
+import { collection, getDocs } from 'firebase/firestore';
+import { jobs as staticJobs } from '@/data/jobs';
 import { JobCard } from '@/components/common/JobCard';
 import { CategoryFilter } from '@/components/common/CategoryFilter';
 import { SearchBar } from '@/components/ui/SearchBar';
@@ -9,6 +10,8 @@ import { Tabs } from '@/components/ui/Tabs';
 import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { db } from '@/lib/firebase';
+import type { Job } from '@/types';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -24,15 +27,34 @@ export function JobBoardPage() {
   const [tab, setTab] = useState('all');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [firestoreJobs, setFirestoreJobs] = useState<Job[]>([]);
+
+  useEffect(() => {
+    getDocs(collection(db, 'jobs'))
+      .then((snapshot) => {
+        const docs = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Job[];
+        setFirestoreJobs(docs);
+      })
+      .catch(() => {});
+  }, []);
+
+  const allJobs = useMemo(() => {
+    const firestoreIds = new Set(firestoreJobs.map((d) => d.id));
+    const uniqueStatic = staticJobs.filter((d) => !firestoreIds.has(d.id));
+    return [...firestoreJobs, ...uniqueStatic];
+  }, [firestoreJobs]);
 
   const filtered = useMemo(() => {
-    return jobs.filter((job) => {
+    return allJobs.filter((job) => {
       if (category !== 'all' && job.categoryId !== category) return false;
       if (tab !== 'all' && job.type !== tab) return false;
       if (search && !job.title.includes(search) && !job.description.includes(search)) return false;
       return true;
     });
-  }, [category, tab, search]);
+  }, [allJobs, category, tab, search]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paged = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
