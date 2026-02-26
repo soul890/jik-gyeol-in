@@ -10,6 +10,7 @@ export function PaymentSuccessPage() {
   const { user, refreshProfile } = useAuth();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMsg, setErrorMsg] = useState('');
+  const [planName, setPlanName] = useState('Pro');
 
   const paymentKey = searchParams.get('paymentKey');
   const orderId = searchParams.get('orderId');
@@ -44,6 +45,7 @@ export function PaymentSuccessPage() {
           throw new Error(data.error || '결제 승인에 실패했습니다.');
         }
 
+        if (data.plan === 'business') setPlanName('Business');
         await refreshProfile();
         setStatus('success');
       } catch (err) {
@@ -71,7 +73,7 @@ export function PaymentSuccessPage() {
               <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
               <h2 className="text-xl font-bold text-warm-800 mb-2">결제 완료!</h2>
               <p className="text-warm-600 mb-6">
-                Pro 구독이 활성화되었습니다. 이제 모든 Pro 기능을 이용하실 수 있습니다.
+                {planName} 구독이 활성화되었습니다. 이제 모든 {planName} 기능을 이용하실 수 있습니다.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link to="/ai-design">

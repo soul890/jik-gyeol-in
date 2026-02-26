@@ -27,7 +27,7 @@ export function SubscriptionModal({ isOpen, onClose, trigger }: SubscriptionModa
 
   const handleSubscribe = () => {
     onClose();
-    navigate('/payment/checkout');
+    navigate('/payment/checkout?plan=pro');
   };
 
   return (

@@ -69,7 +69,7 @@ export interface Supplier {
   createdAt: string;
 }
 
-export type SubscriptionPlan = 'free' | 'pro';
+export type SubscriptionPlan = 'free' | 'pro' | 'business';
 
 export interface Subscription {
   plan: SubscriptionPlan;

@@ -1,11 +1,11 @@
 /**
  * Cloudflare Pages Function: POST /api/payment-confirm
  *
- * Confirms a TossPayments payment and activates Pro subscription.
+ * Confirms a TossPayments payment and activates subscription.
  *
  * Security:
  *   - Firebase ID token verification (Authorization: Bearer <token>)
- *   - Server-side amount validation (19,900 KRW)
+ *   - Server-side amount validation (19,900 or 49,900 KRW)
  *   - TossPayments response cross-validation
  *   - CORS restricted to allowed origins
  *   - Firestore write authenticated with user's ID token
@@ -14,7 +14,11 @@
  *   TOSS_SECRET_KEY – TossPayments secret key
  */
 
-const EXPECTED_AMOUNT = 19900;
+const PLAN_CONFIG = {
+  19900: 'pro',
+  49900: 'business',
+};
+const ALLOWED_AMOUNTS = Object.keys(PLAN_CONFIG).map(Number);
 const FIREBASE_API_KEY = 'AIzaSyCLMpMAXTBKp7M9NxyVjsepdHlq5xCEYv8';
 const ALLOWED_ORIGINS = [
   'https://openinterior.pages.dev',
@@ -46,9 +50,11 @@ export async function onRequestPost(context) {
     }
 
     // Server-side amount validation
-    if (amount !== EXPECTED_AMOUNT) {
+    if (!ALLOWED_AMOUNTS.includes(amount)) {
       return jsonResponse({ error: '결제 금액이 올바르지 않습니다.' }, 400, headers);
     }
+
+    const plan = PLAN_CONFIG[amount];
 
     // Confirm payment with TossPayments API
     const confirmRes = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
@@ -71,11 +77,11 @@ export async function onRequestPost(context) {
     }
 
     // Cross-validate amount from TossPayments response
-    if (confirmData.totalAmount !== EXPECTED_AMOUNT) {
+    if (confirmData.totalAmount !== amount) {
       return jsonResponse({ error: '결제 금액 검증에 실패했습니다.' }, 400, headers);
     }
 
-    // Activate Pro subscription via Firestore REST API (authenticated)
+    // Activate subscription via Firestore REST API (authenticated)
     const projectId = 'jik-gyeol-in';
     const now = new Date();
     const endDate = new Date(now);
@@ -97,7 +103,7 @@ export async function onRequestPost(context) {
           subscription: {
             mapValue: {
               fields: {
-                plan: { stringValue: 'pro' },
+                plan: { stringValue: plan },
                 startDate: { stringValue: now.toISOString() },
                 endDate: { stringValue: endDate.toISOString() },
                 paymentKey: { stringValue: paymentKey },
@@ -115,7 +121,7 @@ export async function onRequestPost(context) {
       return jsonResponse({ error: '구독 상태 업데이트에 실패했습니다.' }, 500, headers);
     }
 
-    return jsonResponse({ success: true, plan: 'pro', endDate: endDate.toISOString() }, 200, headers);
+    return jsonResponse({ success: true, plan, endDate: endDate.toISOString() }, 200, headers);
   } catch (err) {
     console.error('Payment confirm error:', err);
     return jsonResponse(

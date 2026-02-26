@@ -56,8 +56,10 @@ export function PricingPage() {
   const handleSelect = (plan: string) => {
     if (plan === '무료') {
       navigate('/signup');
+    } else if (plan === '비즈니스') {
+      navigate('/payment/checkout?plan=business');
     } else {
-      navigate('/payment/checkout');
+      navigate('/payment/checkout?plan=pro');
     }
   };
 
