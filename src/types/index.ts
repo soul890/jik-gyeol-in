@@ -23,6 +23,17 @@ export interface Job {
   isUrgent?: boolean;
 }
 
+export interface Review {
+  id: string;
+  title: string;
+  content: string;
+  rating: number;
+  author: string;
+  date: string;
+  tags: string[];
+  imageUrl?: string;
+}
+
 export interface Company {
   id: string;
   name: string;
@@ -39,6 +50,7 @@ export interface Company {
   createdAt: string;
   portfolioImages?: string[];
   businessLicenseUrl?: string;
+  reviews?: Review[];
 }
 
 export interface Supplier {
