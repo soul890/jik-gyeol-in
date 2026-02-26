@@ -177,7 +177,7 @@ async function callGemini(apiKey, model, parts) {
 
 async function callGeminiImageGeneration(apiKey, parts) {
   // Use Gemini 2.0 Flash preview with image generation capability
-  const model = 'gemini-2.5-flash-image';
+  const model = 'nano-banana-pro-preview';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const res = await fetch(url, {
