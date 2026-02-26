@@ -5,16 +5,30 @@
  * 1) analyse the room structure
  * 2) generate a redesigned interior image
  *
+ * Security:
+ *   - Firebase ID token verification (Authorization: Bearer <token>)
+ *   - CORS restricted to allowed origins
+ *
  * Environment variable required:
  *   GEMINI_API_KEY – Google AI Studio API key
  */
 
+import { verifyIdToken } from './_auth.js';
+import { corsHeaders, handleOptions } from './_cors.js';
+
 export async function onRequestPost(context) {
   const { request, env } = context;
+  const headers = corsHeaders(request);
   const GEMINI_API_KEY = env.GEMINI_API_KEY;
 
   if (!GEMINI_API_KEY) {
-    return jsonResponse({ error: 'GEMINI_API_KEY is not configured' }, 500);
+    return jsonResponse({ error: 'GEMINI_API_KEY is not configured' }, 500, headers);
+  }
+
+  // Verify Firebase ID token
+  const authResult = await verifyIdToken(request);
+  if (!authResult) {
+    return jsonResponse({ error: '인증이 필요합니다.' }, 401, headers);
   }
 
   try {
@@ -22,7 +36,7 @@ export async function onRequestPost(context) {
 
     const imageFile = formData.get('image');
     if (!imageFile) {
-      return jsonResponse({ error: '방 사진이 필요합니다.' }, 400);
+      return jsonResponse({ error: '방 사진이 필요합니다.' }, 400, headers);
     }
 
     const style = formData.get('style') || '모던';
@@ -83,36 +97,31 @@ export async function onRequestPost(context) {
       ],
     );
 
-    return jsonResponse({ generatedImage, analysis });
+    return jsonResponse({ generatedImage, analysis }, 200, headers);
   } catch (err) {
     console.error('Interior design API error:', err);
     return jsonResponse(
       { error: err.message || 'AI 처리 중 오류가 발생했습니다.' },
       500,
+      headers,
     );
   }
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
-function jsonResponse(body, status = 200) {
+function jsonResponse(body, status = 200, headers = {}) {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
+      ...headers,
     },
   });
 }
 
-export async function onRequestOptions() {
-  return new Response(null, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
+export async function onRequestOptions(context) {
+  return handleOptions(context.request);
 }
 
 function arrayBufferToBase64(buffer) {

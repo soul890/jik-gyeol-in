@@ -24,14 +24,17 @@ export function PaymentSuccessPage() {
 
     const confirm = async () => {
       try {
+        const idToken = await user.getIdToken();
         const res = await fetch('/api/payment-confirm', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
           body: JSON.stringify({
             paymentKey,
             orderId,
             amount: Number(amount),
-            uid: user.uid,
           }),
         });
 

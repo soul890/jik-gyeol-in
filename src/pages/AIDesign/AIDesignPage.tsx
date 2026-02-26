@@ -116,8 +116,12 @@ export function AIDesignPage() {
         formData.append('materialImages', file);
       }
 
+      const idToken = await user!.getIdToken();
       const res = await fetch('/api/interior-design', {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
         body: formData,
       });
 
