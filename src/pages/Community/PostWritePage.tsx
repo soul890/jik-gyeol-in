@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
+import { FileUpload } from '@/components/ui/FileUpload';
 
 export function PostWritePage() {
   const navigate = useNavigate();
@@ -47,6 +48,16 @@ export function PostWritePage() {
               placeholder="내용을 입력하세요"
               rows={12}
             />
+
+            <FileUpload
+              label="사진 첨부 (선택)"
+              accept="image/*"
+              multiple
+              maxFiles={5}
+            />
+            <p className="text-xs text-warm-400 -mt-3">
+              시공 사진, 현장 사진 등을 첨부할 수 있습니다. (최대 5장)
+            </p>
 
             <div className="flex gap-3 pt-4">
               <Button type="submit" className="flex-1">등록하기</Button>

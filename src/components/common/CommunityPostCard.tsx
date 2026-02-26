@@ -19,6 +19,15 @@ export function CommunityPostCard({ post }: CommunityPostCardProps) {
   return (
     <Link to={`/community/${post.id}`}>
       <Card hover>
+        {post.images && post.images.length > 0 && (
+          <div className="aspect-[16/9] overflow-hidden">
+            <img
+              src={post.images[0]}
+              alt={post.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
         <CardContent>
           <div className="flex items-center gap-2 mb-2">
             <Badge variant={categoryVariant[post.category]}>{post.category}</Badge>

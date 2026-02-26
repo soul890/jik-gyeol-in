@@ -98,4 +98,5 @@ export interface CommunityPost {
   views: number;
   likes: number;
   commentCount: number;
+  images?: string[];
 }
