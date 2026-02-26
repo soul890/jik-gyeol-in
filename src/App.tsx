@@ -19,6 +19,7 @@ const PricingPage = lazy(() => import('@/pages/Pricing/PricingPage').then((m) =>
 const LoginPage = lazy(() => import('@/pages/Auth/LoginPage').then((m) => ({ default: m.LoginPage })));
 const SignupPage = lazy(() => import('@/pages/Auth/SignupPage').then((m) => ({ default: m.SignupPage })));
 const ExpertRegisterPage = lazy(() => import('@/pages/Experts/ExpertRegisterPage').then((m) => ({ default: m.ExpertRegisterPage })));
+const AIDesignPage = lazy(() => import('@/pages/AIDesign/AIDesignPage').then((m) => ({ default: m.AIDesignPage })));
 
 function PageLoader() {
   return (
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
       { path: 'login', element: <Suspense fallback={<PageLoader />}><LoginPage /></Suspense> },
       { path: 'signup', element: <Suspense fallback={<PageLoader />}><SignupPage /></Suspense> },
       { path: 'experts/register', element: <Suspense fallback={<PageLoader />}><ExpertRegisterPage /></Suspense> },
+      { path: 'ai-design', element: <Suspense fallback={<PageLoader />}><AIDesignPage /></Suspense> },
     ],
   },
 ]);

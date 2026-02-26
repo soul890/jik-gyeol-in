@@ -1,5 +1,6 @@
 import { HeroSection } from './HeroSection';
 import { FeatureHighlights } from './FeatureHighlights';
+import { AIDesignBanner } from './AIDesignBanner';
 import { QuickCategorySearch } from './QuickCategorySearch';
 import { LatestJobs } from './LatestJobs';
 import { RecentCommunity } from './RecentCommunity';
@@ -9,6 +10,7 @@ export function HomePage() {
     <>
       <HeroSection />
       <FeatureHighlights />
+      <AIDesignBanner />
       <QuickCategorySearch />
       <LatestJobs />
       <RecentCommunity />

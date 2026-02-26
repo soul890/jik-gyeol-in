@@ -10,6 +10,7 @@ const navItems = [
   { path: '/companies', label: '인테리어 업체' },
   { path: '/suppliers', label: '자재업체' },
   { path: '/community', label: '커뮤니티' },
+  { path: '/ai-design', label: 'AI 디자인' },
   { path: '/pricing', label: '요금제' },
 ];
 
