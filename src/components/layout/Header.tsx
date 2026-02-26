@@ -16,7 +16,7 @@ const navItems = [
 export function Header() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, loading, logout } = useAuth();
+  const { user, profile, loading, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();
@@ -64,7 +64,7 @@ export function Header() {
               <>
                 <span className="flex items-center gap-1 text-sm text-warm-600">
                   <User className="w-4 h-4" />
-                  {user.email}
+                  {profile?.nickname || user.email}
                 </span>
                 <button
                   onClick={handleLogout}
@@ -131,7 +131,7 @@ export function Header() {
                 <>
                   <div className="flex items-center gap-1 px-3 py-2.5 text-sm text-warm-600">
                     <User className="w-4 h-4" />
-                    {user.email}
+                    {profile?.nickname || user.email}
                   </div>
                   <button
                     onClick={handleLogout}
