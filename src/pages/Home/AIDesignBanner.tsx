@@ -1,42 +1,49 @@
 import { Link } from 'react-router-dom';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export function AIDesignBanner() {
   return (
-    <section className="bg-gradient-to-r from-primary-50 to-accent/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-          <div className="flex-1">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-full mb-4">
-              <Sparkles className="w-3.5 h-3.5 text-accent" />
-              <span className="text-xs font-semibold text-accent">신규</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-warm-900 mb-3">
-              AI 인테리어 디자인
-            </h2>
-            <p className="text-warm-500 leading-relaxed mb-6 max-w-lg">
-              방 사진 한 장으로 새로운 인테리어를 미리 확인하세요.
-              AI가 구조를 유지한 채 원하는 스타일로 변환해 드립니다.
-            </p>
-            <Link to="/ai-design">
-              <Button>
-                AI 디자인 시작하기
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+      <div className="relative rounded-2xl overflow-hidden">
+        {/* 배경 이미지 (추후 교체) */}
+        <div
+          className="relative w-full aspect-[21/9] sm:aspect-[21/8] bg-cover bg-center"
+          style={{
+            backgroundImage: 'url(/images/ai-banner-bg.jpg)',
+            backgroundColor: '#A89279',
+          }}
+        >
+          <div className="absolute inset-0 bg-black/20" />
 
-          <div className="w-full md:w-80 lg:w-96 aspect-[4/3] bg-gradient-to-br from-primary-100 to-accent/10 rounded-2xl flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white/80 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
-                <Sparkles className="w-8 h-8 text-accent" />
+          {/* Before / After 라벨 */}
+          <span className="absolute bottom-4 left-4 px-3 py-1 bg-white/90 text-warm-800 text-xs font-semibold rounded-md">
+            Before
+          </span>
+          <span className="absolute bottom-4 right-4 px-3 py-1 bg-white/90 text-warm-800 text-xs font-semibold rounded-md">
+            After
+          </span>
+
+          {/* 중앙 오버레이 */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl px-6 py-4 text-center shadow-lg">
+              <div className="w-10 h-10 bg-warm-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <Sparkles className="w-5 h-5 text-accent" />
               </div>
-              <p className="text-sm font-medium text-warm-600">변환 전 → 변환 후</p>
-              <p className="text-xs text-warm-400">AI 인테리어 변환</p>
+              <p className="font-semibold text-warm-800 text-sm sm:text-base">내 공간을 미리 확인하세요.</p>
+              <p className="text-xs sm:text-sm text-warm-500">AI 인테리어 디자인 체험하기</p>
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="flex justify-center mt-5">
+        <Link to="/ai-design">
+          <Button className="rounded-full px-6">
+            <Sparkles className="w-4 h-4" />
+            AI 기능 살펴보기
+          </Button>
+        </Link>
       </div>
     </section>
   );

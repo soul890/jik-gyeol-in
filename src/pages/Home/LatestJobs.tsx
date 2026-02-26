@@ -3,10 +3,10 @@ import { JobCard } from '@/components/common/JobCard';
 import { SectionHeader } from '@/components/common/SectionHeader';
 
 export function LatestJobs() {
-  const latestJobs = jobs.slice(0, 6);
+  const latestJobs = jobs.slice(0, 3);
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14">
       <SectionHeader
         title="최신 구인구직"
         subtitle="방금 올라온 새로운 일감"
