@@ -11,9 +11,15 @@ import {
   Paintbrush,
   Sofa,
 } from 'lucide-react';
+import { doc, updateDoc, increment } from 'firebase/firestore';
 import { Button } from '@/components/ui/Button';
 import { FileUpload } from '@/components/ui/FileUpload';
 import { cn } from '@/utils/cn';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
+import { SubscriptionModal } from '@/components/SubscriptionModal';
+import { LoginPromptModal } from '@/components/LoginPromptModal';
+import { db } from '@/lib/firebase';
 
 // ── Constants ───────────────────────────────────────────────────────
 
@@ -38,6 +44,11 @@ interface AnalysisResult {
 // ── Component ───────────────────────────────────────────────────────
 
 export function AIDesignPage() {
+  const { user, refreshProfile } = useAuth();
+  const { isLoggedIn, canUseAIDesign } = useSubscription();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSubModal, setShowSubModal] = useState(false);
+
   const [step, setStep] = useState(1);
 
   // Step 1 — room photo
@@ -78,6 +89,16 @@ export function AIDesignPage() {
   const handleGenerate = async () => {
     if (!roomImage) return;
 
+    if (!isLoggedIn) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    if (!canUseAIDesign) {
+      setShowSubModal(true);
+      return;
+    }
+
     setLoading(true);
     setError('');
     setGeneratedImage('');
@@ -108,6 +129,15 @@ export function AIDesignPage() {
 
       setGeneratedImage(data.generatedImage);
       setAnalysis(data.analysis);
+
+      // Increment usage count
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+          'usage.aiDesignCount': increment(1),
+        }).catch(() => {});
+        refreshProfile();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '오류가 발생했습니다.');
     } finally {
@@ -521,6 +551,9 @@ export function AIDesignPage() {
           </div>
         )}
       </div>
+
+      <LoginPromptModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <SubscriptionModal isOpen={showSubModal} onClose={() => setShowSubModal(false)} trigger="ai-design" />
     </div>
   );
 }

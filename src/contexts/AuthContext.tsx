@@ -11,11 +11,14 @@ import {
 import type { User } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import type { Subscription, UsageTracking } from '@/types';
 
 export interface UserProfile {
   nickname: string;
   address: string;
   email: string;
+  subscription?: Subscription;
+  usage?: UsageTracking;
 }
 
 interface AuthContextValue {
@@ -26,6 +29,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -95,8 +99,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
   }
 
+  async function refreshProfile() {
+    if (user) {
+      const p = await fetchProfile(user.uid).catch(() => null);
+      setProfile(p);
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signup, login, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, profile, loading, signup, login, loginWithGoogle, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -20,6 +20,9 @@ const LoginPage = lazy(() => import('@/pages/Auth/LoginPage').then((m) => ({ def
 const SignupPage = lazy(() => import('@/pages/Auth/SignupPage').then((m) => ({ default: m.SignupPage })));
 const ExpertRegisterPage = lazy(() => import('@/pages/Experts/ExpertRegisterPage').then((m) => ({ default: m.ExpertRegisterPage })));
 const AIDesignPage = lazy(() => import('@/pages/AIDesign/AIDesignPage').then((m) => ({ default: m.AIDesignPage })));
+const CheckoutPage = lazy(() => import('@/pages/Payment/CheckoutPage').then((m) => ({ default: m.CheckoutPage })));
+const PaymentSuccessPage = lazy(() => import('@/pages/Payment/PaymentSuccessPage').then((m) => ({ default: m.PaymentSuccessPage })));
+const PaymentFailPage = lazy(() => import('@/pages/Payment/PaymentFailPage').then((m) => ({ default: m.PaymentFailPage })));
 
 function PageLoader() {
   return (
@@ -52,6 +55,9 @@ const router = createBrowserRouter([
       { path: 'signup', element: <Suspense fallback={<PageLoader />}><SignupPage /></Suspense> },
       { path: 'experts/register', element: <Suspense fallback={<PageLoader />}><ExpertRegisterPage /></Suspense> },
       { path: 'ai-design', element: <Suspense fallback={<PageLoader />}><AIDesignPage /></Suspense> },
+      { path: 'payment/checkout', element: <Suspense fallback={<PageLoader />}><CheckoutPage /></Suspense> },
+      { path: 'payment/success', element: <Suspense fallback={<PageLoader />}><PaymentSuccessPage /></Suspense> },
+      { path: 'payment/fail', element: <Suspense fallback={<PageLoader />}><PaymentFailPage /></Suspense> },
     ],
   },
 ]);

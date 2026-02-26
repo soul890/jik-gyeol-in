@@ -69,6 +69,21 @@ export interface Supplier {
   createdAt: string;
 }
 
+export type SubscriptionPlan = 'free' | 'pro';
+
+export interface Subscription {
+  plan: SubscriptionPlan;
+  startDate: string;
+  endDate: string;
+  paymentKey?: string;
+  orderId?: string;
+}
+
+export interface UsageTracking {
+  aiDesignCount: number;
+  lastResetDate: string;
+}
+
 export type CommunityCategory = '시공노하우' | '질문답변' | '자유게시판';
 
 export interface CommunityPost {

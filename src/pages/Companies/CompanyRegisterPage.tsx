@@ -12,9 +12,11 @@ import { FileUpload } from '@/components/ui/FileUpload';
 import { categories } from '@/data/categories';
 import { db, storage } from '@/lib/firebase';
 import { cn } from '@/utils/cn';
+import { useSubscription } from '@/hooks/useSubscription';
 
 export function CompanyRegisterPage() {
   const navigate = useNavigate();
+  const { maxPortfolioImages } = useSubscription();
   const [showSuccess, setShowSuccess] = useState(false);
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -149,10 +151,10 @@ export function CompanyRegisterPage() {
             />
 
             <FileUpload
-              label="시공 사례 사진 (최대 5장)"
+              label={`시공 사례 사진 (최대 ${maxPortfolioImages}장)`}
               accept="image/*"
               multiple
-              maxFiles={5}
+              maxFiles={maxPortfolioImages}
               onChange={setPortfolioFiles}
             />
 

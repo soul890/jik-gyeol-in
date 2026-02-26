@@ -1,10 +1,8 @@
-import { useState } from 'react';
 import { Check, X, Sparkles, Building2, User, ArrowRight, Shield, Clock, CreditCard } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
-import { Modal } from '@/components/ui/Modal';
-import { cn } from '@/utils/cn';
 
 interface PlanFeature {
   text: string;
@@ -53,12 +51,14 @@ const faqs = [
 ];
 
 export function PricingPage() {
-  const [showModal, setShowModal] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState('');
+  const navigate = useNavigate();
 
   const handleSelect = (plan: string) => {
-    setSelectedPlan(plan);
-    setShowModal(true);
+    if (plan === '무료') {
+      navigate('/signup');
+    } else {
+      navigate('/payment/checkout');
+    }
   };
 
   return (
@@ -342,34 +342,6 @@ export function PricingPage() {
         </Button>
       </section>
 
-      {/* 데모 모달 */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title={`${selectedPlan} 플랜 선택`}
-      >
-        <div className="text-center py-4">
-          <div className={cn(
-            'w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4',
-            selectedPlan === '무료' && 'bg-warm-100',
-            selectedPlan === '프로' && 'bg-primary-100',
-            selectedPlan === '비즈니스' && 'bg-accent/10',
-          )}>
-            {selectedPlan === '무료' && <User className="w-8 h-8 text-warm-500" />}
-            {selectedPlan === '프로' && <Sparkles className="w-8 h-8 text-primary-600" />}
-            {selectedPlan === '비즈니스' && <Building2 className="w-8 h-8 text-accent" />}
-          </div>
-          <p className="text-warm-600 mb-2">
-            <span className="font-bold text-warm-800">{selectedPlan}</span> 플랜을 선택하셨습니다.
-          </p>
-          <p className="text-sm text-warm-400 mb-6">
-            현재 데모 버전으로, 실제 결제는 진행되지 않습니다.
-          </p>
-          <Button className="w-full" onClick={() => setShowModal(false)}>
-            확인
-          </Button>
-        </div>
-      </Modal>
     </div>
   );
 }

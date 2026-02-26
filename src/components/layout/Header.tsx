@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, LogOut, User, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 import { cn } from '@/utils/cn';
 
 const navItems = [
@@ -18,6 +19,7 @@ export function Header() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, profile, loading, logout } = useAuth();
+  const { isPro } = useSubscription();
 
   const handleLogout = async () => {
     await logout();
@@ -71,6 +73,11 @@ export function Header() {
                 <span className="flex items-center gap-1 text-sm text-warm-600">
                   <User className="w-4 h-4" />
                   {profile?.nickname || user.email}
+                  {isPro && (
+                    <span className="ml-1 px-1.5 py-0.5 bg-primary-500 text-white text-xs font-bold rounded">
+                      Pro
+                    </span>
+                  )}
                 </span>
                 <button
                   onClick={handleLogout}
@@ -143,6 +150,11 @@ export function Header() {
                   <div className="flex items-center gap-1 px-3 py-2.5 text-sm text-warm-600">
                     <User className="w-4 h-4" />
                     {profile?.nickname || user.email}
+                    {isPro && (
+                      <span className="ml-1 px-1.5 py-0.5 bg-primary-500 text-white text-xs font-bold rounded">
+                        Pro
+                      </span>
+                    )}
                   </div>
                   <button
                     onClick={handleLogout}
