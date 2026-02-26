@@ -21,6 +21,7 @@ export interface Job {
   createdAt: string;
   views: number;
   isUrgent?: boolean;
+  images?: string[];
 }
 
 export interface Review {

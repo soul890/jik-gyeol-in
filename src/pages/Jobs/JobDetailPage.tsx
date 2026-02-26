@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
-import { ArrowLeft, MapPin, Clock, Eye, User, MessageCircle, Send } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Eye, User, MessageCircle, Send, X } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { jobs } from '@/data/jobs';
 import { categories } from '@/data/categories';
@@ -14,6 +14,7 @@ import { formatDate } from '@/utils/format';
 export function JobDetailPage() {
   const { id } = useParams();
   const job = jobs.find((j) => j.id === id);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [showInquiryModal, setShowInquiryModal] = useState(false);
   const [inquiryForm, setInquiryForm] = useState({ name: '', phone: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
@@ -110,6 +111,28 @@ export function JobDetailPage() {
             </div>
           </div>
 
+          {job.images && job.images.length > 0 && (
+            <div className="mb-6">
+              <h3 className="font-semibold text-warm-800 mb-3">첨부 사진</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {job.images.map((url, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setLightboxUrl(url)}
+                    className="aspect-[4/3] rounded-lg overflow-hidden border border-warm-200 cursor-pointer hover:opacity-90 transition-opacity"
+                  >
+                    <img
+                      src={url}
+                      alt={`첨부 사진 ${i + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="pt-6 border-t border-warm-200">
             <button
               onClick={() => setShowInquiryModal(true)}
@@ -121,6 +144,24 @@ export function JobDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* 이미지 라이트박스 */}
+      {lightboxUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70" onClick={() => setLightboxUrl(null)}>
+          <button
+            onClick={() => setLightboxUrl(null)}
+            className="absolute top-4 right-4 p-2 bg-white/20 rounded-full text-white hover:bg-white/30 transition-colors cursor-pointer"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <img
+            src={lightboxUrl}
+            alt="첨부 사진"
+            className="max-w-full max-h-[85vh] rounded-lg object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       {/* 채팅 상담 모달 */}
       <Modal isOpen={showInquiryModal} onClose={handleCloseModal} title={`${job.title} 상담 문의`}>

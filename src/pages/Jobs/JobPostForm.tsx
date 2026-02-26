@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
+import { FileUpload } from '@/components/ui/FileUpload';
 import { categories } from '@/data/categories';
 import { Modal } from '@/components/ui/Modal';
 
@@ -58,6 +59,16 @@ export function JobPostForm() {
               placeholder="작업 내용, 기간, 자격 요건 등을 자세히 적어주세요"
               rows={8}
             />
+
+            <FileUpload
+              label="사진 첨부 (선택)"
+              accept="image/*"
+              multiple
+              maxFiles={5}
+            />
+            <p className="text-xs text-warm-400 -mt-3">
+              현장 사진, 시공 사례, 자격증 등을 첨부하면 신뢰도가 높아집니다. (최대 5장)
+            </p>
 
             <Input id="contact" label="연락처" placeholder="전화번호 또는 이메일" />
 

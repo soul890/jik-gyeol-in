@@ -16,6 +16,15 @@ export function JobCard({ job }: JobCardProps) {
   return (
     <Link to={`/jobs/${job.id}`}>
       <Card hover>
+        {job.images && job.images.length > 0 && (
+          <div className="aspect-[16/9] overflow-hidden">
+            <img
+              src={job.images[0]}
+              alt={job.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
         <CardContent>
           <div className="flex items-start justify-between gap-2 mb-3">
             <div className="flex items-center gap-2 flex-wrap">
