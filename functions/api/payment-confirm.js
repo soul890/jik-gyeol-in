@@ -14,14 +14,17 @@
  *   TOSS_SECRET_KEY – TossPayments secret key
  */
 
-import { verifyIdToken } from './_auth.js';
-import { corsHeaders, handleOptions } from './_cors.js';
-
 const EXPECTED_AMOUNT = 19900;
+const FIREBASE_API_KEY = 'AIzaSyCLMpMAXTBKp7M9NxyVjsepdHlq5xCEYv8';
+const ALLOWED_ORIGINS = [
+  'https://openinterior.pages.dev',
+  'http://localhost:5173',
+  'http://localhost:4173',
+];
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const headers = corsHeaders(request);
+  const headers = buildCorsHeaders(request);
   const TOSS_SECRET_KEY = env.TOSS_SECRET_KEY;
 
   if (!TOSS_SECRET_KEY) {
@@ -123,6 +126,71 @@ export async function onRequestPost(context) {
   }
 }
 
+export async function onRequestOptions(context) {
+  const origin = getAllowedOrigin(context.request);
+  if (!origin) {
+    return new Response(null, { status: 403 });
+  }
+  return new Response(null, {
+    headers: {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+}
+
+// ── Inline utilities ─────────────────────────────────────────────────
+
+function getAllowedOrigin(request) {
+  const origin = request.headers.get('Origin');
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    return origin;
+  }
+  return null;
+}
+
+function buildCorsHeaders(request) {
+  const origin = getAllowedOrigin(request);
+  if (!origin) {
+    return {};
+  }
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Credentials': 'true',
+  };
+}
+
+async function verifyIdToken(request) {
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+  const idToken = authHeader.slice(7);
+  if (!idToken) {
+    return null;
+  }
+  try {
+    const res = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      },
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const user = data.users?.[0];
+    if (!user?.localId) return null;
+    return { uid: user.localId };
+  } catch {
+    return null;
+  }
+}
+
 function jsonResponse(body, status = 200, headers = {}) {
   return new Response(JSON.stringify(body), {
     status,
@@ -131,8 +199,4 @@ function jsonResponse(body, status = 200, headers = {}) {
       ...headers,
     },
   });
-}
-
-export async function onRequestOptions(context) {
-  return handleOptions(context.request);
 }
