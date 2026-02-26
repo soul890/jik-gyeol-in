@@ -23,16 +23,16 @@ const ALLOWED_ORIGINS = [
 export async function onRequestPost(context) {
   const { request, env } = context;
   const headers = buildCorsHeaders(request);
-  const GEMINI_API_KEY = env.GEMINI_API_KEY;
 
-  if (!GEMINI_API_KEY) {
-    return jsonResponse({ error: 'GEMINI_API_KEY is not configured' }, 500, headers);
-  }
-
-  // Verify Firebase ID token
+  // Verify Firebase ID token first
   const authResult = await verifyIdToken(request);
   if (!authResult) {
     return jsonResponse({ error: '인증이 필요합니다.' }, 401, headers);
+  }
+
+  const GEMINI_API_KEY = env.GEMINI_API_KEY;
+  if (!GEMINI_API_KEY) {
+    return jsonResponse({ error: 'GEMINI_API_KEY is not configured' }, 500, headers);
   }
 
   try {

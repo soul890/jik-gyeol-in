@@ -25,18 +25,18 @@ const ALLOWED_ORIGINS = [
 export async function onRequestPost(context) {
   const { request, env } = context;
   const headers = buildCorsHeaders(request);
-  const TOSS_SECRET_KEY = env.TOSS_SECRET_KEY;
 
-  if (!TOSS_SECRET_KEY) {
-    return jsonResponse({ error: 'TOSS_SECRET_KEY is not configured' }, 500, headers);
-  }
-
-  // Verify Firebase ID token
+  // Verify Firebase ID token first
   const authResult = await verifyIdToken(request);
   if (!authResult) {
     return jsonResponse({ error: '인증이 필요합니다.' }, 401, headers);
   }
   const { uid } = authResult;
+
+  const TOSS_SECRET_KEY = env.TOSS_SECRET_KEY;
+  if (!TOSS_SECRET_KEY) {
+    return jsonResponse({ error: 'TOSS_SECRET_KEY is not configured' }, 500, headers);
+  }
 
   try {
     const { paymentKey, orderId, amount } = await request.json();
