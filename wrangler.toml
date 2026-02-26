@@ -1,3 +1,6 @@
 name = "openinterior"
 compatibility_date = "2024-09-23"
 pages_build_output_dir = "dist"
+
+[vars]
+GEMINI_API_KEY = "AIzaSyDw9YqCQlaD1710L_P3M0ZGrgglwEC5TNU"
