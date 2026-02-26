@@ -14,15 +14,24 @@ export function CompanyCard({ company }: CompanyCardProps) {
   return (
     <Link to={`/companies/${company.id}`}>
       <Card hover>
+        {company.portfolioImages && company.portfolioImages.length > 0 ? (
+          <div className="aspect-[16/9] overflow-hidden">
+            <img
+              src={company.portfolioImages[0]}
+              alt={company.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="aspect-[16/9] bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center">
+            <span className="text-primary-600 font-bold text-4xl">{company.name[0]}</span>
+          </div>
+        )}
         <CardContent>
           <div className="flex items-start justify-between mb-3">
-            <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
-              <span className="text-primary-600 font-bold text-lg">{company.name[0]}</span>
-            </div>
+            <h3 className="font-semibold text-warm-800">{company.name}</h3>
             <Rating value={company.rating} size="sm" />
           </div>
-
-          <h3 className="font-semibold text-warm-800 mb-1">{company.name}</h3>
 
           <div className="flex items-center gap-1 text-sm text-warm-500 mb-3">
             <MapPin className="w-3.5 h-3.5" />
