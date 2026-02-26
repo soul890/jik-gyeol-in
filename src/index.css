@@ -1,68 +1,39 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@theme {
+  --color-primary-50: #fdf8f0;
+  --color-primary-100: #f5e6d0;
+  --color-primary-200: #e8cba3;
+  --color-primary-300: #d4a96e;
+  --color-primary-400: #c4924e;
+  --color-primary-500: #a67c52;
+  --color-primary-600: #8b6540;
+  --color-primary-700: #6d4e31;
+  --color-primary-800: #4e3724;
+  --color-primary-900: #3d2b1d;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  --color-accent: #c06b3e;
+  --color-accent-light: #d88a62;
+  --color-accent-dark: #a05530;
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  --color-warm-50: #faf9f7;
+  --color-warm-100: #f0ede8;
+  --color-warm-200: #e5dfd8;
+  --color-warm-300: #cec5b9;
+  --color-warm-400: #b0a394;
+  --color-warm-500: #948574;
+  --color-warm-600: #7a6d5e;
+  --color-warm-700: #5e534a;
+  --color-warm-800: #3e3832;
+  --color-warm-900: #2a2520;
+
+  --font-family-sans: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
+    "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic",
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+  background-color: var(--color-warm-50);
+  color: var(--color-warm-800);
 }
