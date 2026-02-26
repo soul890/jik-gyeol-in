@@ -409,7 +409,7 @@ export function AIDesignPage() {
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-lg font-semibold text-warm-800">
-                      Before / After
+                      변환 전 / 후 비교
                     </h2>
                     <div className="flex items-center bg-warm-100 rounded-lg p-0.5">
                       <button
@@ -422,7 +422,7 @@ export function AIDesignPage() {
                             : 'text-warm-500',
                         )}
                       >
-                        After
+                        변환 후
                       </button>
                       <button
                         type="button"
@@ -434,7 +434,7 @@ export function AIDesignPage() {
                             : 'text-warm-500',
                         )}
                       >
-                        Before
+                        변환 전
                       </button>
                     </div>
                   </div>

@@ -10,7 +10,7 @@ export function AIDesignBanner() {
           <div className="flex-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-full mb-4">
               <Sparkles className="w-3.5 h-3.5 text-accent" />
-              <span className="text-xs font-semibold text-accent">NEW</span>
+              <span className="text-xs font-semibold text-accent">신규</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-warm-900 mb-3">
               AI 인테리어 디자인
@@ -32,7 +32,7 @@ export function AIDesignBanner() {
               <div className="w-16 h-16 bg-white/80 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-sm">
                 <Sparkles className="w-8 h-8 text-accent" />
               </div>
-              <p className="text-sm font-medium text-warm-600">Before → After</p>
+              <p className="text-sm font-medium text-warm-600">변환 전 → 변환 후</p>
               <p className="text-xs text-warm-400">AI 인테리어 변환</p>
             </div>
           </div>

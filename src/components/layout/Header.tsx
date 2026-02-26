@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, LogOut, User } from 'lucide-react';
+import { Menu, X, LogOut, User, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/utils/cn';
 
@@ -10,7 +10,7 @@ const navItems = [
   { path: '/companies', label: '인테리어 업체' },
   { path: '/suppliers', label: '자재업체' },
   { path: '/community', label: '커뮤니티' },
-  { path: '/ai-design', label: 'AI 디자인' },
+  { path: '/ai-design', label: 'AI 디자인', highlight: true },
   { path: '/pricing', label: '요금제' },
 ];
 
@@ -49,11 +49,16 @@ export function Header() {
                   to={item.path}
                   className={cn(
                     'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-warm-600 hover:text-warm-800 hover:bg-warm-100',
+                    item.highlight
+                      ? isActive
+                        ? 'bg-accent text-white'
+                        : 'text-accent font-semibold hover:bg-accent/10'
+                      : isActive
+                        ? 'bg-primary-50 text-primary-700'
+                        : 'text-warm-600 hover:text-warm-800 hover:bg-warm-100',
                   )}
                 >
+                  {item.highlight && <Sparkles className="w-3.5 h-3.5 inline mr-1" />}
                   {item.label}
                 </Link>
               );
@@ -117,11 +122,16 @@ export function Header() {
                   onClick={() => setMobileOpen(false)}
                   className={cn(
                     'block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'text-warm-600 hover:bg-warm-100',
+                    item.highlight
+                      ? isActive
+                        ? 'bg-accent text-white'
+                        : 'text-accent font-semibold hover:bg-accent/10'
+                      : isActive
+                        ? 'bg-primary-50 text-primary-700'
+                        : 'text-warm-600 hover:bg-warm-100',
                   )}
                 >
+                  {item.highlight && <Sparkles className="w-3.5 h-3.5 inline mr-1" />}
                   {item.label}
                 </Link>
               );
