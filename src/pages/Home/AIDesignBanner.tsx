@@ -10,7 +10,7 @@ export function AIDesignBanner() {
         <div
           className="relative w-full aspect-[21/9] sm:aspect-[21/8] bg-cover bg-center"
           style={{
-            backgroundImage: 'url(/images/ai-banner-bg.jpg)',
+            backgroundImage: 'url(/images/ai-banner-bg.png)',
             backgroundColor: '#A89279',
           }}
         >

@@ -9,7 +9,7 @@ export function HeroSection() {
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: 'url(/images/hero-bg.jpg)',
+          backgroundImage: 'url(/images/hero-bg.png)',
           backgroundColor: '#8B7355',
         }}
       />
