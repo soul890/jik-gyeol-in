@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
+import { FileUpload } from '@/components/ui/FileUpload';
 import { categories } from '@/data/categories';
 import { cn } from '@/utils/cn';
 
@@ -69,6 +70,16 @@ export function SupplierRegisterPage() {
             <Input id="delivery" label="배송 정보" placeholder="예: 수도권 당일 배송" />
             <Input id="phone" label="전화번호" placeholder="02-XXXX-XXXX" />
             <Input id="email" label="이메일" placeholder="example@email.com" />
+
+            <FileUpload
+              label="제품/매장 사진 (선택, 최대 5장)"
+              accept="image/*"
+              multiple
+              maxFiles={5}
+            />
+            <p className="text-xs text-warm-400 -mt-3">
+              대표 제품이나 매장 사진을 등록하면 노출도가 높아집니다.
+            </p>
 
             <div className="flex gap-3 pt-4">
               <Button type="submit" className="flex-1">등록하기</Button>

@@ -68,6 +68,7 @@ export interface Supplier {
   minOrderAmount: string;
   deliveryInfo: string;
   createdAt: string;
+  images?: string[];
 }
 
 export type SubscriptionPlan = 'free' | 'pro' | 'business';

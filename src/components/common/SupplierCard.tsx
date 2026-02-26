@@ -13,15 +13,24 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
   return (
     <Link to={`/suppliers/${supplier.id}`}>
       <Card hover>
+        {supplier.images && supplier.images.length > 0 ? (
+          <div className="aspect-[16/9] overflow-hidden">
+            <img
+              src={supplier.images[0]}
+              alt={supplier.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="aspect-[16/9] bg-gradient-to-br from-accent/5 to-accent/15 flex items-center justify-center">
+            <Package className="w-10 h-10 text-accent/40" />
+          </div>
+        )}
         <CardContent>
           <div className="flex items-start justify-between mb-3">
-            <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
-              <Package className="w-6 h-6 text-accent" />
-            </div>
+            <h3 className="font-semibold text-warm-800">{supplier.name}</h3>
             <Rating value={supplier.rating} size="sm" />
           </div>
-
-          <h3 className="font-semibold text-warm-800 mb-1">{supplier.name}</h3>
 
           <div className="flex items-center gap-1 text-sm text-warm-500 mb-3">
             <MapPin className="w-3.5 h-3.5" />
