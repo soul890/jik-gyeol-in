@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, LogOut, User, Sparkles } from 'lucide-react';
+import { Menu, X, LogOut, User, Sparkles, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useUnreadCount } from '@/hooks/useUnreadCount';
 import { cn } from '@/utils/cn';
 
 const navItems = [
@@ -20,6 +21,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, profile, loading, logout } = useAuth();
   const { isPro } = useSubscription();
+  const unreadCount = useUnreadCount();
 
   const handleLogout = async () => {
     await logout();
@@ -79,6 +81,18 @@ export function Header() {
                     </span>
                   )}
                 </span>
+                <Link
+                  to="/chat"
+                  className="relative flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-warm-600 hover:text-warm-800 hover:bg-warm-100 transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  채팅
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-warm-600 hover:text-warm-800 hover:bg-warm-100 transition-colors cursor-pointer"
@@ -156,6 +170,19 @@ export function Header() {
                       </span>
                     )}
                   </div>
+                  <Link
+                    to="/chat"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-1 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-warm-600 hover:bg-warm-100 transition-colors"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    채팅
+                    {unreadCount > 0 && (
+                      <span className="ml-auto w-5 h-5 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="flex items-center gap-1 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-warm-600 hover:bg-warm-100 transition-colors cursor-pointer"

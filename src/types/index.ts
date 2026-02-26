@@ -86,6 +86,25 @@ export interface UsageTracking {
   lastResetDate: string;
 }
 
+export interface ChatRoom {
+  id: string;
+  participants: string[];
+  participantNames: Record<string, string>;
+  lastMessage: string;
+  lastMessageAt: { toDate: () => Date; toMillis: () => number } | null;
+  context: { type: 'job' | 'company' | 'supplier'; id: string; title: string };
+  createdAt: { toDate: () => Date; toMillis: () => number };
+  unreadCount: Record<string, number>;
+}
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  senderName: string;
+  text: string;
+  createdAt: { toDate: () => Date } | null;
+}
+
 export type CommunityCategory = '시공노하우' | '질문답변' | '자유게시판';
 
 export interface CommunityPost {

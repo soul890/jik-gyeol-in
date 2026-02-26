@@ -13,6 +13,11 @@ export function formatDate(dateString: string): string {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
 }
 
+export function formatTimestamp(ts: { toDate: () => Date } | null | undefined): string {
+  if (!ts) return '';
+  return formatDate(ts.toDate().toISOString());
+}
+
 export function formatNumber(num: number): string {
   if (num >= 10000) {
     return `${(num / 10000).toFixed(1)}만`;
