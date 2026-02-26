@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { ArrowLeft, MapPin, Mail, Users, Calendar, Briefcase, X, MessageCircle, Star, Send } from 'lucide-react';
+import { ArrowLeft, MapPin, Users, Calendar, Briefcase, X, MessageCircle, Star, Send } from 'lucide-react';
 import { doc, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { companies as staticCompanies } from '@/data/companies';
 import { categories } from '@/data/categories';
@@ -233,8 +233,8 @@ export function CompanyDetailPage() {
             </div>
           </div>
 
-          {/* 연락처: 채팅 상담 버튼 + 이메일 */}
-          <div className="flex flex-col gap-3 pt-6 border-t border-warm-200">
+          {/* 연락처: 채팅 상담 버튼 */}
+          <div className="pt-6 border-t border-warm-200">
             <button
               onClick={() => setShowInquiryModal(true)}
               className="flex items-center justify-center gap-2 w-full py-3.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl transition-colors cursor-pointer"
@@ -242,10 +242,6 @@ export function CompanyDetailPage() {
               <MessageCircle className="w-5 h-5" />
               채팅으로 상담하기
             </button>
-            <div className="flex items-center justify-center gap-2 text-sm text-warm-400">
-              <Mail className="w-4 h-4" />
-              <span>{company.contact}</span>
-            </div>
           </div>
         </CardContent>
       </Card>
