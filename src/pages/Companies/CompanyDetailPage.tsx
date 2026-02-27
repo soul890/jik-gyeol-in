@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { MapPin, Users, Calendar, Briefcase, X, MessageCircle, Star, Flag, Phone, Mail, ChevronLeft, ChevronRight, Grid2x2 } from 'lucide-react';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { categories } from '@/data/categories';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -11,6 +11,7 @@ import { LoginPromptModal } from '@/components/LoginPromptModal';
 import { ReportModal } from '@/components/ReportModal';
 import { ReviewFormModal } from '@/components/ReviewFormModal';
 import { findOrCreateChatRoom } from '@/utils/chat';
+import { formatDate } from '@/utils/format';
 import type { Company, Review } from '@/types';
 
 function ReviewItem({ review }: { review: Review }) {
@@ -22,7 +23,7 @@ function ReviewItem({ review }: { review: Review }) {
         </div>
         <div>
           <p className="font-semibold text-warm-800 text-sm">{review.author}</p>
-          <p className="text-xs text-warm-400">{review.date}</p>
+          <p className="text-xs text-warm-400">{formatDate(review.date)}</p>
         </div>
       </div>
       <div className="flex items-center gap-1 mb-2">
@@ -66,12 +67,16 @@ export function CompanyDetailPage() {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
 
-  const fetchCompany = () => {
+  const fetchCompany = (incrementView = false) => {
     if (!id) return;
-    getDoc(doc(db, 'companies', id))
+    const docRef = doc(db, 'companies', id);
+    getDoc(docRef)
       .then((snap) => {
         if (snap.exists()) {
           setCompany({ id: snap.id, ...snap.data() } as Company);
+          if (incrementView) {
+            updateDoc(docRef, { views: increment(1) }).catch(() => {});
+          }
         }
       })
       .catch(() => {})
@@ -83,7 +88,7 @@ export function CompanyDetailPage() {
       setLoading(false);
       return;
     }
-    fetchCompany();
+    fetchCompany(true);
   }, [id]);
 
   const isOwnListing = !!user && !!company?.uid && company.uid === user.uid;
@@ -273,7 +278,7 @@ export function CompanyDetailPage() {
                 <Calendar className="w-5 h-5 text-warm-500 mt-0.5 shrink-0" />
                 <div>
                   <p className="text-xs text-warm-400 mb-0.5">등록일</p>
-                  <p className="text-sm font-medium text-warm-800">{company.createdAt}</p>
+                  <p className="text-sm font-medium text-warm-800">{formatDate(company.createdAt)}</p>
                 </div>
               </div>
             </div>

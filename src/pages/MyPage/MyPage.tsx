@@ -219,7 +219,7 @@ export function MyPage() {
           {(isPro || isBusiness) && profile?.subscription && (
             <div className="mt-3 pt-3 border-t border-warm-100">
               <p className="text-xs text-warm-400">
-                구독 만료일: {new Date(profile.subscription.endDate).toLocaleDateString('ko-KR')}
+                구독 만료일: {formatDate(profile.subscription.endDate)}
               </p>
             </div>
           )}
@@ -322,7 +322,7 @@ export function MyPage() {
                       <Link to={`/companies/${company.id}`} className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <Building2 className="w-4 h-4 text-warm-400" />
-                          <span className="text-xs text-warm-400">{company.createdAt}</span>
+                          <span className="text-xs text-warm-400">{formatDate(company.createdAt)}</span>
                         </div>
                         <h3 className="font-semibold text-warm-800 truncate">{company.name}</h3>
                         <div className="flex items-center gap-3 mt-1 text-xs text-warm-400">
@@ -354,7 +354,7 @@ export function MyPage() {
                       <Link to={`/suppliers/${supplier.id}`} className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <Package className="w-4 h-4 text-warm-400" />
-                          <span className="text-xs text-warm-400">{supplier.createdAt}</span>
+                          <span className="text-xs text-warm-400">{formatDate(supplier.createdAt)}</span>
                         </div>
                         <h3 className="font-semibold text-warm-800 truncate">{supplier.name}</h3>
                         <p className="text-xs text-warm-400 mt-1">{supplier.location}</p>

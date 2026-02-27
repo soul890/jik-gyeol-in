@@ -22,7 +22,15 @@ export function LatestJobs() {
 
   const latestJobs = useMemo(() => {
     return [...firestoreJobs]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort((a, b) => {
+        const getTime = (v: unknown): number => {
+          if (!v) return 0;
+          if (typeof v === 'string') return new Date(v).getTime();
+          if (typeof v === 'object' && v !== null && 'seconds' in v) return (v as { seconds: number }).seconds * 1000;
+          return 0;
+        };
+        return getTime(b.createdAt) - getTime(a.createdAt);
+      })
       .slice(0, 3);
   }, [firestoreJobs]);
 

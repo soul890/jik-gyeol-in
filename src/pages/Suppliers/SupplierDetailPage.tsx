@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, MapPin, Package, Truck, Banknote, MessageCircle, X, Flag } from 'lucide-react';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { categories } from '@/data/categories';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -31,10 +31,12 @@ export function SupplierDetailPage() {
       return;
     }
 
-    getDoc(doc(db, 'suppliers', id))
+    const docRef = doc(db, 'suppliers', id);
+    getDoc(docRef)
       .then((snap) => {
         if (snap.exists()) {
           setSupplier({ id: snap.id, ...snap.data() } as Supplier);
+          updateDoc(docRef, { views: increment(1) }).catch(() => {});
         }
       })
       .catch(() => {})
