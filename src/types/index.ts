@@ -125,8 +125,17 @@ export interface CommunityPost {
   createdAt: string;
   views: number;
   likes: number;
+  likedBy?: string[];
   commentCount: number;
   images?: string[];
   blocks?: Block[];
   uid?: string;
+}
+
+export interface CommunityComment {
+  id: string;
+  text: string;
+  author: string;
+  uid: string;
+  createdAt: { toDate: () => Date } | string | null;
 }
