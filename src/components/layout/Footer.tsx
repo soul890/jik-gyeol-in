@@ -46,8 +46,8 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link to="/about" className="hover:text-white transition-colors">회사소개</Link></li>
               <li><Link to="/contact" className="hover:text-white transition-colors">문의하기</Link></li>
-              <li>이메일: support@jikgyeolin.kr</li>
-              <li>전화: 02-1234-5678</li>
+              <li>이메일: soul8904@gmail.com</li>
+              <li>전화: 010-3252-8904</li>
               <li>운영시간: 평일 09:00~18:00</li>
               <li className="pt-2 border-t border-warm-700">
                 <Link to="/terms" className="hover:text-white transition-colors">이용약관</Link>

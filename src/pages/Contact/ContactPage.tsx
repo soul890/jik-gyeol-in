@@ -8,8 +8,8 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { db } from '@/lib/firebase';
 
 const contactInfo = [
-  { icon: Mail, label: '이메일', value: 'support@jikgyeolin.kr', href: 'mailto:support@jikgyeolin.kr' },
-  { icon: Phone, label: '전화', value: '02-1234-5678', href: 'tel:02-1234-5678' },
+  { icon: Mail, label: '이메일', value: 'soul8904@gmail.com', href: 'mailto:soul8904@gmail.com' },
+  { icon: Phone, label: '전화', value: '010-3252-8904', href: 'tel:010-3252-8904' },
   { icon: Clock, label: '운영시간', value: '평일 09:00 ~ 18:00 (주말·공휴일 휴무)' },
   { icon: MapPin, label: '주소', value: '서울특별시 강남구 테헤란로 123' },
 ];
@@ -72,7 +72,7 @@ export function ContactPage() {
         </div>
         <h1 className="text-2xl font-bold text-warm-800 mb-3">문의가 접수되었습니다</h1>
         <p className="text-warm-500 mb-1">영업일 기준 1~2일 이내에 입력하신 이메일로 답변 드리겠습니다.</p>
-        <p className="text-warm-400 text-sm mb-8">빠른 확인이 필요하시면 전화 상담(02-1234-5678)을 이용해 주세요.</p>
+        <p className="text-warm-400 text-sm mb-8">빠른 확인이 필요하시면 전화 상담(010-3252-8904)을 이용해 주세요.</p>
         <Button onClick={() => { setSubmitted(false); setForm({ name: '', email: user?.email || '', category: '일반 문의', message: '' }); }}>
           추가 문의하기
         </Button>

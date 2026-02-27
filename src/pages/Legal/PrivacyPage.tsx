@@ -123,7 +123,8 @@ export function PrivacyPage() {
             <p>개인정보 보호 관련 문의는 아래로 연락해주세요.</p>
             <ul className="mt-2 space-y-1">
               <li>담당: 개인정보 보호책임자</li>
-              <li>이메일: privacy@jik-gyeol-in.com</li>
+              <li>이메일: soul8904@gmail.com</li>
+              <li>전화: 010-3252-8904</li>
             </ul>
           </div>
         </section>
