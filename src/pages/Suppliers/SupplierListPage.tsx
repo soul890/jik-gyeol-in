@@ -3,18 +3,15 @@ import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
 import { SupplierCard } from '@/components/common/SupplierCard';
-import { CategoryFilter } from '@/components/common/CategoryFilter';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { db } from '@/lib/firebase';
-import { supplierCategories } from '@/data/categories';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import type { Supplier } from '@/types';
 
 export function SupplierListPage() {
   usePageTitle('자재업체');
-  const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [firestoreSuppliers, setFirestoreSuppliers] = useState<Supplier[]>([]);
 
@@ -34,11 +31,10 @@ export function SupplierListPage() {
 
   const filtered = useMemo(() => {
     return allSuppliers.filter((s) => {
-      if (category !== 'all' && !s.categories.includes(category)) return false;
       if (search && !s.name.includes(search) && !s.products.some((p) => p.includes(search))) return false;
       return true;
     });
-  }, [allSuppliers, category, search]);
+  }, [allSuppliers, search]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -55,9 +51,8 @@ export function SupplierListPage() {
         </Link>
       </div>
 
-      <div className="space-y-4 mb-6">
+      <div className="mb-6">
         <SearchBar placeholder="업체명 또는 제품 검색..." onSearch={setSearch} />
-        <CategoryFilter selected={category} onChange={setCategory} items={supplierCategories} />
       </div>
 
       {filtered.length > 0 ? (

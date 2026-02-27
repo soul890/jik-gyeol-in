@@ -18,6 +18,3 @@ export const categories: Category[] = [
   { id: 'cleaning', name: '청소', icon: 'SprayCan', description: '입주 청소 및 사후 관리', jobCount: 0, group: 'service' },
   { id: 'aircon', name: '에어컨', icon: 'AirVent', description: '에어컨 설치 및 이전', jobCount: 0, group: 'service' },
 ];
-
-/** 자재업체에서 사용할 카테고리 (시공 공정 제외) */
-export const supplierCategories = categories.filter((c) => c.group === 'material');

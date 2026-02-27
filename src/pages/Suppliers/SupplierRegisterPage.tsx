@@ -9,16 +9,13 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { FileUpload } from '@/components/ui/FileUpload';
-import { supplierCategories } from '@/data/categories';
 import { db, storage } from '@/lib/firebase';
-import { cn } from '@/utils/cn';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function SupplierRegisterPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showSuccess, setShowSuccess] = useState(false);
-  const [selectedCats, setSelectedCats] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -32,12 +29,6 @@ export function SupplierRegisterPage() {
   const [email, setEmail] = useState('');
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-
-  const toggleCategory = (id: string) => {
-    setSelectedCats((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
-    );
-  };
 
   const uploadFile = async (file: File, path: string): Promise<string> => {
     const storageRef = ref(storage, path);
@@ -66,7 +57,7 @@ export function SupplierRegisterPage() {
         uid: user?.uid || '',
         name,
         description: desc,
-        categories: selectedCats,
+        categories: [],
         products: products.split(',').map((p) => p.trim()).filter(Boolean),
         location,
         minOrderAmount: minOrder,
@@ -108,27 +99,6 @@ export function SupplierRegisterPage() {
             <Input id="name" label="업체명" placeholder="업체명을 입력하세요" value={name} onChange={(e) => setName(e.target.value)} required />
 
             <Textarea id="desc" label="업체 소개" placeholder="업체를 소개해주세요" rows={4} value={desc} onChange={(e) => setDesc(e.target.value)} />
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-medium text-warm-700">관련 공정 (복수 선택)</label>
-              <div className="flex flex-wrap gap-2">
-                {supplierCategories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => toggleCategory(cat.id)}
-                    className={cn(
-                      'px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer',
-                      selectedCats.includes(cat.id)
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-warm-100 text-warm-600 hover:bg-warm-200',
-                    )}
-                  >
-                    {cat.name}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             <Textarea id="products" label="취급 제품" placeholder="취급 제품을 쉼표로 구분하여 입력해주세요" rows={3} value={products} onChange={(e) => setProducts(e.target.value)} />
 
