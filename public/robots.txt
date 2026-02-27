@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /payment/
+Disallow: /chat
+Disallow: /mypage
+
+Sitemap: https://jik-gyeol-in.web.app/sitemap.xml

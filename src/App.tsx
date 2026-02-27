@@ -31,6 +31,8 @@ const SearchPage = lazy(() => import('@/pages/Search/SearchPage').then((m) => ({
 const AdminPage = lazy(() => import('@/pages/Admin/AdminPage').then((m) => ({ default: m.AdminPage })));
 const TermsPage = lazy(() => import('@/pages/Legal/TermsPage').then((m) => ({ default: m.TermsPage })));
 const PrivacyPage = lazy(() => import('@/pages/Legal/PrivacyPage').then((m) => ({ default: m.PrivacyPage })));
+const AboutPage = lazy(() => import('@/pages/About/AboutPage').then((m) => ({ default: m.AboutPage })));
+const ContactPage = lazy(() => import('@/pages/Contact/ContactPage').then((m) => ({ default: m.ContactPage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFound/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
 function PageLoader() {
@@ -70,6 +72,8 @@ const router = createBrowserRouter([
       { path: 'signup', element: <Suspense fallback={<PageLoader />}><SignupPage /></Suspense> },
       { path: 'terms', element: <Suspense fallback={<PageLoader />}><TermsPage /></Suspense> },
       { path: 'privacy', element: <Suspense fallback={<PageLoader />}><PrivacyPage /></Suspense> },
+      { path: 'about', element: <Suspense fallback={<PageLoader />}><AboutPage /></Suspense> },
+      { path: 'contact', element: <Suspense fallback={<PageLoader />}><ContactPage /></Suspense> },
       { path: 'payment/success', element: <Suspense fallback={<PageLoader />}><PaymentSuccessPage /></Suspense> },
       { path: 'payment/fail', element: <Suspense fallback={<PageLoader />}><PaymentFailPage /></Suspense> },
       { path: '*', element: <Suspense fallback={<PageLoader />}><NotFoundPage /></Suspense> },

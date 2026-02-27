@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
+import { CookieConsent } from '@/components/CookieConsent';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 export function Layout() {
@@ -15,6 +16,7 @@ export function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <CookieConsent />
     </div>
   );
 }
