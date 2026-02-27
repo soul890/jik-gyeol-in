@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Pagination } from '@/components/ui/Pagination';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { db } from '@/lib/firebase';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import type { Job } from '@/types';
 
 const ITEMS_PER_PAGE = 9;
@@ -28,6 +29,7 @@ export function JobBoardPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [firestoreJobs, setFirestoreJobs] = useState<Job[]>([]);
+  usePageTitle('구인구직');
 
   useEffect(() => {
     getDocs(collection(db, 'jobs'))

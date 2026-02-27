@@ -9,9 +9,11 @@ import { SearchBar } from '@/components/ui/SearchBar';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { db } from '@/lib/firebase';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import type { Supplier } from '@/types';
 
 export function SupplierListPage() {
+  usePageTitle('자재업체');
   const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [firestoreSuppliers, setFirestoreSuppliers] = useState<Supplier[]>([]);

@@ -9,6 +9,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { db } from '@/lib/firebase';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import type { CommunityCategory, CommunityPost } from '@/types';
 
 const communityTabs = [
@@ -19,6 +20,7 @@ const communityTabs = [
 ];
 
 export function CommunityPage() {
+  usePageTitle('커뮤니티');
   const [tab, setTab] = useState('all');
   const [search, setSearch] = useState('');
   const [firestorePosts, setFirestorePosts] = useState<CommunityPost[]>([]);

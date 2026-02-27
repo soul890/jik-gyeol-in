@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { db } from '@/lib/firebase';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { formatDate } from '@/utils/format';
 import type { Job, Company, Supplier, CommunityPost } from '@/types';
 
@@ -30,6 +31,7 @@ const tabs = [
 
 export function MyPage() {
   const navigate = useNavigate();
+  usePageTitle('마이페이지');
   const { user, profile, refreshProfile, logout } = useAuth();
   const { isPro, isBusiness } = useSubscription();
   const [activeTab, setActiveTab] = useState<TabId>('jobs');

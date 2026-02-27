@@ -7,6 +7,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { Badge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { db } from '@/lib/firebase';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { formatDate } from '@/utils/format';
 import { jobs as staticJobs } from '@/data/jobs';
 import { companies as staticCompanies } from '@/data/companies';
@@ -23,6 +24,7 @@ function matchQuery(text: string, query: string) {
 export function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get('q') || '';
+  usePageTitle(q ? `"${q}" 검색 결과` : '검색');
   const [activeTab, setActiveTab] = useState<TabId>('all');
   const [inputValue, setInputValue] = useState(q);
   const [loading, setLoading] = useState(true);
