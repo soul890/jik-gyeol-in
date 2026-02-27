@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
+import { Modal } from '@/components/ui/Modal';
+import { auth, db } from '@/lib/firebase';
 
 export function LoginPage() {
   usePageTitle('로그인');
@@ -16,6 +20,20 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // 아이디 찾기
+  const [findIdOpen, setFindIdOpen] = useState(false);
+  const [findIdNickname, setFindIdNickname] = useState('');
+  const [findIdResult, setFindIdResult] = useState<string | null>(null);
+  const [findIdLoading, setFindIdLoading] = useState(false);
+  const [findIdError, setFindIdError] = useState('');
+
+  // 비밀번호 찾기
+  const [resetPwOpen, setResetPwOpen] = useState(false);
+  const [resetPwEmail, setResetPwEmail] = useState('');
+  const [resetPwSent, setResetPwSent] = useState(false);
+  const [resetPwLoading, setResetPwLoading] = useState(false);
+  const [resetPwError, setResetPwError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +65,55 @@ export function LoginPage() {
       navigate(from, { replace: true });
     } catch {
       setError('Google 로그인에 실패했습니다.');
+    }
+  };
+
+  const handleFindId = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!findIdNickname.trim()) return;
+    setFindIdError('');
+    setFindIdResult(null);
+    setFindIdLoading(true);
+    try {
+      const snap = await getDocs(
+        query(collection(db, 'users'), where('nickname', '==', findIdNickname.trim())),
+      );
+      if (snap.empty) {
+        setFindIdError('해당 닉네임으로 등록된 계정을 찾을 수 없습니다.');
+      } else {
+        const userData = snap.docs[0].data();
+        const foundEmail = userData.email as string;
+        // 이메일 일부 마스킹 (abc@gmail.com → a**@gmail.com)
+        const [local, domain] = foundEmail.split('@');
+        const masked = local[0] + '*'.repeat(Math.max(local.length - 1, 1)) + '@' + domain;
+        setFindIdResult(masked);
+      }
+    } catch {
+      setFindIdError('검색 중 오류가 발생했습니다.');
+    } finally {
+      setFindIdLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetPwEmail.trim()) return;
+    setResetPwError('');
+    setResetPwLoading(true);
+    try {
+      await sendPasswordResetEmail(auth, resetPwEmail.trim());
+      setResetPwSent(true);
+    } catch (err) {
+      const code = (err as { code?: string }).code;
+      if (code === 'auth/invalid-email') {
+        setResetPwError('유효하지 않은 이메일 형식입니다.');
+      } else if (code === 'auth/user-not-found') {
+        setResetPwError('해당 이메일로 등록된 계정이 없습니다.');
+      } else {
+        setResetPwError('이메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      }
+    } finally {
+      setResetPwLoading(false);
     }
   };
 
@@ -84,6 +151,25 @@ export function LoginPage() {
             </Button>
           </form>
 
+          {/* 아이디/비밀번호 찾기 */}
+          <div className="flex items-center justify-center gap-3 mt-4 text-sm">
+            <button
+              type="button"
+              onClick={() => { setFindIdOpen(true); setFindIdNickname(''); setFindIdResult(null); setFindIdError(''); }}
+              className="text-warm-500 hover:text-warm-700 transition-colors cursor-pointer"
+            >
+              아이디 찾기
+            </button>
+            <span className="text-warm-300">|</span>
+            <button
+              type="button"
+              onClick={() => { setResetPwOpen(true); setResetPwEmail(''); setResetPwSent(false); setResetPwError(''); }}
+              className="text-warm-500 hover:text-warm-700 transition-colors cursor-pointer"
+            >
+              비밀번호 찾기
+            </button>
+          </div>
+
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-warm-200" />
@@ -115,6 +201,92 @@ export function LoginPage() {
           </p>
         </CardContent>
       </Card>
+
+      {/* 아이디 찾기 모달 */}
+      <Modal isOpen={findIdOpen} onClose={() => setFindIdOpen(false)} title="아이디 찾기">
+        <form onSubmit={handleFindId} className="space-y-4">
+          <p className="text-sm text-warm-500">
+            회원가입 시 등록한 닉네임을 입력하면 가입된 이메일을 확인할 수 있습니다.
+          </p>
+          {findIdError && (
+            <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+              {findIdError}
+            </div>
+          )}
+          {findIdResult ? (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-lg px-4 py-4 text-center">
+              <p className="mb-1">등록된 이메일을 찾았습니다.</p>
+              <p className="text-lg font-bold">{findIdResult}</p>
+            </div>
+          ) : (
+            <>
+              <Input
+                id="find-nickname"
+                label="닉네임"
+                type="text"
+                placeholder="닉네임을 입력하세요"
+                value={findIdNickname}
+                onChange={(e) => setFindIdNickname(e.target.value)}
+                required
+              />
+              <Button type="submit" className="w-full" disabled={findIdLoading}>
+                {findIdLoading ? '검색 중...' : '아이디 찾기'}
+              </Button>
+            </>
+          )}
+          {findIdResult && (
+            <Button
+              type="button"
+              className="w-full"
+              onClick={() => { setFindIdOpen(false); setEmail(findIdResult.includes('*') ? '' : findIdResult); }}
+            >
+              로그인으로 돌아가기
+            </Button>
+          )}
+        </form>
+      </Modal>
+
+      {/* 비밀번호 찾기 모달 */}
+      <Modal isOpen={resetPwOpen} onClose={() => setResetPwOpen(false)} title="비밀번호 찾기">
+        {resetPwSent ? (
+          <div className="space-y-4">
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-lg px-4 py-4 text-center">
+              <p className="font-medium mb-1">비밀번호 재설정 이메일을 발송했습니다.</p>
+              <p className="text-emerald-600">{resetPwEmail}</p>
+            </div>
+            <p className="text-sm text-warm-500">
+              이메일의 링크를 클릭하여 새 비밀번호를 설정해 주세요.
+              이메일이 도착하지 않으면 스팸 폴더를 확인해 주세요.
+            </p>
+            <Button type="button" className="w-full" onClick={() => setResetPwOpen(false)}>
+              로그인으로 돌아가기
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleResetPassword} className="space-y-4">
+            <p className="text-sm text-warm-500">
+              가입 시 사용한 이메일을 입력하면 비밀번호 재설정 링크를 보내드립니다.
+            </p>
+            {resetPwError && (
+              <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
+                {resetPwError}
+              </div>
+            )}
+            <Input
+              id="reset-email"
+              label="이메일"
+              type="email"
+              placeholder="가입한 이메일을 입력하세요"
+              value={resetPwEmail}
+              onChange={(e) => setResetPwEmail(e.target.value)}
+              required
+            />
+            <Button type="submit" className="w-full" disabled={resetPwLoading}>
+              {resetPwLoading ? '발송 중...' : '비밀번호 재설정 이메일 보내기'}
+            </Button>
+          </form>
+        )}
+      </Modal>
     </div>
   );
 }
