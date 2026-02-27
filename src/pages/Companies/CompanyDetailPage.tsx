@@ -9,6 +9,7 @@ import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginPromptModal } from '@/components/LoginPromptModal';
 import { ReportModal } from '@/components/ReportModal';
+import { ReviewFormModal } from '@/components/ReviewFormModal';
 import { findOrCreateChatRoom } from '@/utils/chat';
 import type { Company, Review } from '@/types';
 
@@ -62,14 +63,11 @@ export function CompanyDetailPage() {
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
 
-  useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      return;
-    }
-
+  const fetchCompany = () => {
+    if (!id) return;
     getDoc(doc(db, 'companies', id))
       .then((snap) => {
         if (snap.exists()) {
@@ -78,6 +76,14 @@ export function CompanyDetailPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+    fetchCompany();
   }, [id]);
 
   const isOwnListing = !!user && !!company?.uid && company.uid === user.uid;
@@ -302,11 +308,28 @@ export function CompanyDetailPage() {
 
             {/* 후기 섹션 */}
             <div className="mb-8">
-              <div className="flex items-center gap-2 mb-2">
-                <Star className="w-5 h-5 fill-warm-800 text-warm-800" />
-                <h2 className="text-xl font-semibold text-warm-900">
-                  {avgRating} · 후기 {reviews.length}개
-                </h2>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Star className="w-5 h-5 fill-warm-800 text-warm-800" />
+                  <h2 className="text-xl font-semibold text-warm-900">
+                    {avgRating} · 후기 {reviews.length}개
+                  </h2>
+                </div>
+                {!isOwnListing && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (!user) {
+                        setShowLoginPrompt(true);
+                      } else {
+                        setShowReviewForm(true);
+                      }
+                    }}
+                  >
+                    후기 작성
+                  </Button>
+                )}
               </div>
               {reviews.length > 0 ? (
                 <div className="divide-y divide-warm-100">
@@ -418,6 +441,13 @@ export function CompanyDetailPage() {
         />
       )}
       <LoginPromptModal isOpen={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
+      <ReviewFormModal
+        isOpen={showReviewForm}
+        onClose={() => setShowReviewForm(false)}
+        companyId={company.id}
+        companyName={company.name}
+        onSuccess={fetchCompany}
+      />
 
       {/* 사진 모두 보기 모달 */}
       {showAllPhotos && (
