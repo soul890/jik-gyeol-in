@@ -7,6 +7,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
+  sendEmailVerification,
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -30,6 +31,7 @@ interface AuthContextValue {
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  resendVerification: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -71,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const userProfile: UserProfile = { nickname, address, email };
     await setDoc(doc(db, 'users', cred.user.uid), userProfile);
     setProfile(userProfile);
+    await sendEmailVerification(cred.user).catch(() => {});
   }
 
   async function login(email: string, password: string) {
@@ -106,8 +109,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function resendVerification() {
+    if (user && !user.emailVerified) {
+      await sendEmailVerification(user);
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signup, login, loginWithGoogle, logout, refreshProfile }}>
+    <AuthContext.Provider value={{ user, profile, loading, signup, login, loginWithGoogle, logout, refreshProfile, resendVerification }}>
       {children}
     </AuthContext.Provider>
   );
