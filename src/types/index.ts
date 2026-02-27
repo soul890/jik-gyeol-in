@@ -111,6 +111,11 @@ export interface ChatMessage {
 
 export type CommunityCategory = '시공노하우' | '질문답변' | '자유게시판';
 
+export type Block =
+  | { type: 'text'; value: string }
+  | { type: 'image'; url: string; caption?: string }
+  | { type: 'divider' };
+
 export interface CommunityPost {
   id: string;
   category: CommunityCategory;
@@ -122,5 +127,6 @@ export interface CommunityPost {
   likes: number;
   commentCount: number;
   images?: string[];
+  blocks?: Block[];
   uid?: string;
 }

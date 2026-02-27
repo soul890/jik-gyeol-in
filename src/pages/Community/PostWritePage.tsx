@@ -1,32 +1,58 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
-import { FileUpload } from '@/components/ui/FileUpload';
+import { BlockEditor } from '@/components/community/BlockEditor';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
+import type { Block } from '@/types';
 
 export function PostWritePage() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [showSuccess, setShowSuccess] = useState(false);
-  const [formData, setFormData] = useState({
-    category: '시공노하우',
-    title: '',
-    content: '',
-  });
+  const [submitting, setSubmitting] = useState(false);
+  const [category, setCategory] = useState('시공노하우');
+  const [title, setTitle] = useState('');
+  const [blocks, setBlocks] = useState<Block[]>([{ type: 'text', value: '' }]);
+
+  // Pre-generate postId for Storage path
+  const postId = useMemo(() => crypto.randomUUID(), []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
+
+    // Validate: at least title and some content
+    const hasContent = blocks.some(
+      (b) => (b.type === 'text' && b.value.trim()) || (b.type === 'image' && b.url),
+    );
+    if (!title.trim() || !hasContent) return;
+
+    setSubmitting(true);
     try {
+      // Extract image URLs for card thumbnail compatibility
+      const images = blocks
+        .filter((b): b is Extract<Block, { type: 'image' }> => b.type === 'image' && !!b.url)
+        .map((b) => b.url);
+
+      // Build plain text content for backwards compat / search
+      const content = blocks
+        .filter((b): b is Extract<Block, { type: 'text' }> => b.type === 'text')
+        .map((b) => b.value)
+        .join('\n');
+
       await addDoc(collection(db, 'communityPosts'), {
-        ...formData,
+        category,
+        title: title.trim(),
+        content,
+        blocks,
+        images,
         uid: user?.uid || '',
         author: profile?.nickname || '익명',
         createdAt: serverTimestamp(),
@@ -37,6 +63,8 @@ export function PostWritePage() {
       setShowSuccess(true);
     } catch {
       setShowSuccess(true);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -55,8 +83,8 @@ export function PostWritePage() {
             <Select
               id="category"
               label="카테고리"
-              value={formData.category}
-              onChange={(e) => setFormData((f) => ({ ...f, category: e.target.value }))}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
               options={[
                 { value: '시공노하우', label: '시공노하우' },
                 { value: '질문답변', label: '질문답변' },
@@ -68,31 +96,24 @@ export function PostWritePage() {
               id="title"
               label="제목"
               placeholder="제목을 입력하세요"
-              value={formData.title}
-              onChange={(e) => setFormData((f) => ({ ...f, title: e.target.value }))}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
 
-            <Textarea
-              id="content"
-              label="내용"
-              placeholder="내용을 입력하세요"
-              rows={12}
-              value={formData.content}
-              onChange={(e) => setFormData((f) => ({ ...f, content: e.target.value }))}
-            />
-
-            <FileUpload
-              label="사진 첨부 (선택)"
-              accept="image/*"
-              multiple
-              maxFiles={5}
-            />
-            <p className="text-xs text-warm-400 -mt-3">
-              시공 사진, 현장 사진 등을 첨부할 수 있습니다. (최대 5장)
-            </p>
+            <div>
+              <label className="block text-sm font-medium text-warm-700 mb-2">내용</label>
+              <div className="border border-warm-200 rounded-lg p-4 bg-white min-h-[200px]">
+                <BlockEditor blocks={blocks} onChange={setBlocks} postId={postId} />
+              </div>
+              <p className="text-xs text-warm-400 mt-2">
+                블록 사이의 + 버튼으로 텍스트, 사진, 구분선을 추가할 수 있습니다.
+              </p>
+            </div>
 
             <div className="flex gap-3 pt-4">
-              <Button type="submit" className="flex-1">등록하기</Button>
+              <Button type="submit" className="flex-1" disabled={submitting}>
+                {submitting ? '등록 중...' : '등록하기'}
+              </Button>
               <Button type="button" variant="outline" onClick={() => navigate('/community')}>
                 취소
               </Button>
