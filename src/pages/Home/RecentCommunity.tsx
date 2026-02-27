@@ -52,14 +52,16 @@ export function RecentCommunity() {
             to={`/community/${post.id}`}
             className="group bg-white border border-warm-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow"
           >
-            {/* 썸네일 (추후 이미지 교체) */}
-            <div
-              className="w-full aspect-[16/9] bg-cover bg-center"
-              style={{
-                backgroundImage: `url(/images/community-${post.id}.jpg)`,
-                backgroundColor: '#D4C5B2',
-              }}
-            />
+            {post.images && post.images.length > 0 ? (
+              <div
+                className="w-full aspect-[16/9] bg-cover bg-center"
+                style={{ backgroundImage: `url(${post.images[0]})` }}
+              />
+            ) : (
+              <div className="w-full aspect-[16/9] bg-warm-100 flex items-center justify-center">
+                <span className="text-warm-300 text-sm">이미지 없음</span>
+              </div>
+            )}
             <div className="p-4">
               <h4 className="font-semibold text-warm-800 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
                 {post.title}
