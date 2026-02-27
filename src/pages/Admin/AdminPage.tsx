@@ -32,11 +32,12 @@ interface UserInfo {
   subscription?: { plan: string };
 }
 
-type TabId = 'reports' | 'users';
+type TabId = 'reports' | 'users' | 'data';
 
 const tabs = [
   { id: 'reports', label: '신고 관리' },
   { id: 'users', label: '사용자 관리' },
+  { id: 'data', label: '데이터 관리' },
 ];
 
 const statusLabel: Record<string, string> = {
@@ -68,6 +69,8 @@ export function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<Report | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [dataCounts, setDataCounts] = useState<Record<string, number>>({});
+  const [clearingCollection, setClearingCollection] = useState<string | null>(null);
 
   useEffect(() => {
     if (profile?.role !== 'admin') return;
@@ -85,6 +88,18 @@ export function AdminPage() {
       if (userSnap) {
         setUsers(userSnap.docs.map((d) => ({ id: d.id, ...d.data() }) as UserInfo));
       }
+
+      // 컬렉션별 데이터 수 조회
+      const collections = ['jobs', 'companies', 'suppliers', 'communityPosts'];
+      const counts: Record<string, number> = {};
+      await Promise.all(
+        collections.map(async (col) => {
+          const snap = await getDocs(collection(db, col)).catch(() => null);
+          counts[col] = snap?.size ?? 0;
+        }),
+      );
+      setDataCounts(counts);
+
       setLoading(false);
     };
 
@@ -133,6 +148,20 @@ export function AdminPage() {
       // silently fail
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleClearCollection = async (colName: string) => {
+    if (!confirm(`"${colName}" 컬렉션의 모든 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
+    setClearingCollection(colName);
+    try {
+      const snap = await getDocs(collection(db, colName));
+      await Promise.all(snap.docs.map((d) => deleteDoc(doc(db, colName, d.id))));
+      setDataCounts((prev) => ({ ...prev, [colName]: 0 }));
+    } catch {
+      alert('삭제 실패. 권한을 확인해주세요.');
+    } finally {
+      setClearingCollection(null);
     }
   };
 
@@ -252,6 +281,40 @@ export function AdminPage() {
                   );
                 })
               )}
+            </div>
+          )}
+
+          {/* 데이터 관리 */}
+          {activeTab === 'data' && (
+            <div className="space-y-3">
+              <Card>
+                <CardContent className="py-4">
+                  <p className="text-sm text-warm-500 mb-4">
+                    각 컬렉션의 모든 데이터를 삭제합니다. 삭제 후 복구할 수 없으니 주의하세요.
+                  </p>
+                  {[
+                    { col: 'jobs', label: '구인구직' },
+                    { col: 'companies', label: '인테리어 업체' },
+                    { col: 'suppliers', label: '자재업체' },
+                    { col: 'communityPosts', label: '커뮤니티 게시글' },
+                  ].map(({ col, label }) => (
+                    <div key={col} className="flex items-center justify-between py-3 border-b border-warm-100 last:border-0">
+                      <div>
+                        <p className="font-medium text-warm-800">{label}</p>
+                        <p className="text-xs text-warm-400">{col} · {dataCounts[col] ?? 0}개</p>
+                      </div>
+                      <Button
+                        onClick={() => handleClearCollection(col)}
+                        disabled={clearingCollection === col || (dataCounts[col] ?? 0) === 0}
+                        className="bg-red-500 hover:bg-red-600 text-white text-sm"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        {clearingCollection === col ? '삭제 중...' : '전체 삭제'}
+                      </Button>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
             </div>
           )}
 
