@@ -65,7 +65,7 @@ export function CompanyListPage() {
       </div>
 
       {filtered.length > 0 ? (
-        <div className="flex flex-wrap justify-center gap-4 [&>*]:w-full [&>*]:sm:w-[calc(50%-0.5rem)] [&>*]:lg:w-[calc(33.333%-0.75rem)]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((company) => (
             <CompanyCard key={company.id} company={company} />
           ))}

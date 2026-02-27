@@ -70,7 +70,7 @@ export function CommunityPage() {
       </div>
 
       {filtered.length > 0 ? (
-        <div className="flex flex-wrap justify-center gap-4 [&>*]:w-full [&>*]:sm:w-[calc(50%-0.5rem)]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {filtered.map((post) => (
             <CommunityPostCard key={post.id} post={post} />
           ))}

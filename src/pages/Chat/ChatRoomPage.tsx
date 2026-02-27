@@ -160,7 +160,7 @@ export function ChatRoomPage() {
           const isMe = msg.senderId === user.uid;
           return (
             <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[75%] ${isMe ? 'order-1' : ''}`}>
+              <div className={`max-w-[85%] sm:max-w-[75%] ${isMe ? 'order-1' : ''}`}>
                 {!isMe && (
                   <p className="text-xs text-warm-500 mb-1 ml-1">{msg.senderName}</p>
                 )}

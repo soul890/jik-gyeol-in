@@ -14,7 +14,7 @@ export function QuickCategorySearch() {
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14">
       <h2 className="text-2xl font-bold text-warm-800 mb-8">공정별 찾기</h2>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
         {categories.map((cat) => {
           const Icon = iconMap[cat.icon] || Hammer;
           return (
