@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { FileUpload } from '@/components/ui/FileUpload';
-import { categories } from '@/data/categories';
+import { supplierCategories } from '@/data/categories';
 import { db, storage } from '@/lib/firebase';
 import { cn } from '@/utils/cn';
 import { useAuth } from '@/contexts/AuthContext';
@@ -112,7 +112,7 @@ export function SupplierRegisterPage() {
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-warm-700">관련 공정 (복수 선택)</label>
               <div className="flex flex-wrap gap-2">
-                {categories.map((cat) => (
+                {supplierCategories.map((cat) => (
                   <button
                     key={cat.id}
                     type="button"

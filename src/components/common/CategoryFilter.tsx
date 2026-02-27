@@ -1,13 +1,17 @@
 import { cn } from '@/utils/cn';
 import { categories } from '@/data/categories';
+import type { Category } from '@/types';
 
 interface CategoryFilterProps {
   selected: string;
   onChange: (id: string) => void;
   className?: string;
+  items?: Category[];
 }
 
-export function CategoryFilter({ selected, onChange, className }: CategoryFilterProps) {
+export function CategoryFilter({ selected, onChange, className, items }: CategoryFilterProps) {
+  const list = items ?? categories;
+
   return (
     <div className={cn('flex flex-wrap gap-2', className)}>
       <button
@@ -21,7 +25,7 @@ export function CategoryFilter({ selected, onChange, className }: CategoryFilter
       >
         전체
       </button>
-      {categories.map((cat) => (
+      {list.map((cat) => (
         <button
           key={cat.id}
           onClick={() => onChange(cat.id)}

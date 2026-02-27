@@ -4,6 +4,7 @@ export interface Category {
   icon: string;
   description: string;
   jobCount: number;
+  group: 'construction' | 'material' | 'service';
 }
 
 export type JobType = '구인' | '구직';

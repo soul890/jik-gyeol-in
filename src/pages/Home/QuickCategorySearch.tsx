@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom';
 import {
   Hammer, TreePine, Grid3x3, Wallpaper, Paintbrush, Zap,
   Pipette, Square, DoorOpen, Armchair, Lightbulb, Droplets, Film,
+  HardHat, SprayCan, AirVent,
 } from 'lucide-react';
 import { categories } from '@/data/categories';
 
 const iconMap: Record<string, React.ElementType> = {
   Hammer, TreePine, Grid3x3, Wallpaper, Paintbrush, Zap,
   Pipette, Square, DoorOpen, Armchair, Lightbulb, Droplets, Film,
+  HardHat, SprayCan, AirVent,
 };
 
 export function QuickCategorySearch() {

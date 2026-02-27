@@ -8,6 +8,7 @@ import { SearchBar } from '@/components/ui/SearchBar';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { db } from '@/lib/firebase';
+import { supplierCategories } from '@/data/categories';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import type { Supplier } from '@/types';
 
@@ -56,7 +57,7 @@ export function SupplierListPage() {
 
       <div className="space-y-4 mb-6">
         <SearchBar placeholder="업체명 또는 제품 검색..." onSearch={setSearch} />
-        <CategoryFilter selected={category} onChange={setCategory} />
+        <CategoryFilter selected={category} onChange={setCategory} items={supplierCategories} />
       </div>
 
       {filtered.length > 0 ? (
