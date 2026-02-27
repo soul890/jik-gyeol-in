@@ -2,7 +2,6 @@ import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, Eye, ThumbsUp, MessageCircle, User, X, Flag } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
-import { communityPosts as staticPosts } from '@/data/communityPosts';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -27,13 +26,6 @@ export function PostDetailPage() {
   const [showReport, setShowReport] = useState(false);
 
   useEffect(() => {
-    const staticMatch = staticPosts.find((p) => p.id === id);
-    if (staticMatch) {
-      setPost(staticMatch);
-      setLoading(false);
-      return;
-    }
-
     if (!id) {
       setLoading(false);
       return;
@@ -133,22 +125,9 @@ export function PostDetailPage() {
           )}
 
           <div className="mt-8 pt-6 border-t border-warm-200">
-            <h3 className="font-semibold text-warm-800 mb-4">댓글 {post.commentCount}개</h3>
-            <div className="space-y-4">
-              <div className="p-4 bg-warm-50 rounded-xl">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-medium text-warm-700">익명의 기사님</span>
-                  <span className="text-xs text-warm-400">2시간 전</span>
-                </div>
-                <p className="text-sm text-warm-600">좋은 정보 감사합니다. 많은 도움이 되었습니다!</p>
-              </div>
-              <div className="p-4 bg-warm-50 rounded-xl">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-medium text-warm-700">인테리어 입문자</span>
-                  <span className="text-xs text-warm-400">5시간 전</span>
-                </div>
-                <p className="text-sm text-warm-600">자세한 설명 감사합니다. 참고하겠습니다.</p>
-              </div>
+            <h3 className="font-semibold text-warm-800 mb-4">댓글</h3>
+            <div className="text-center py-6 text-sm text-warm-400">
+              아직 댓글이 없습니다
             </div>
           </div>
         </CardContent>

@@ -2,7 +2,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, MapPin, Clock, Eye, User, MessageCircle, X, Flag } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
-import { jobs as staticJobs } from '@/data/jobs';
 import { categories } from '@/data/categories';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -27,13 +26,6 @@ export function JobDetailPage() {
   const [chatLoading, setChatLoading] = useState(false);
 
   useEffect(() => {
-    const staticMatch = staticJobs.find((j) => j.id === id);
-    if (staticMatch) {
-      setJob(staticMatch);
-      setLoading(false);
-      return;
-    }
-
     if (!id) {
       setLoading(false);
       return;

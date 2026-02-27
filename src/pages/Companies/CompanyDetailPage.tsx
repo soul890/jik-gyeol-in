@@ -2,7 +2,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, MapPin, Users, Calendar, Briefcase, X, MessageCircle, Star, Flag } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
-import { companies as staticCompanies } from '@/data/companies';
 import { categories } from '@/data/categories';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -70,13 +69,6 @@ export function CompanyDetailPage() {
   const [chatLoading, setChatLoading] = useState(false);
 
   useEffect(() => {
-    const staticMatch = staticCompanies.find((c) => c.id === id);
-    if (staticMatch) {
-      setCompany(staticMatch);
-      setLoading(false);
-      return;
-    }
-
     if (!id) {
       setLoading(false);
       return;
@@ -88,9 +80,7 @@ export function CompanyDetailPage() {
           setCompany({ id: snap.id, ...snap.data() } as Company);
         }
       })
-      .catch(() => {
-        // Firebase 미연결
-      })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
 

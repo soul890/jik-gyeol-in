@@ -29,6 +29,8 @@ export function RecommendedCompanies() {
       .slice(0, 3);
   }, [firestoreCompanies]);
 
+  if (topCompanies.length === 0) return null;
+
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 py-14">
       <SectionHeader

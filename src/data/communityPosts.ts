@@ -1,37 +1,3 @@
 import type { CommunityPost } from '@/types';
 
-export const communityPosts: CommunityPost[] = [
-  {
-    id: 'post-1',
-    category: '시공노하우',
-    title: '욕실 방수, 이것만 알면 실패 없습니다',
-    content: '안녕하세요, 20년차 방수 전문 기사입니다.\n\n욕실 방수 시 가장 중요한 포인트를 공유합니다.\n\n1. 기존 방수층 완전 제거가 먼저\n2. 프라이머는 절대 생략하지 마세요\n3. 코너 부분 보강 메쉬 필수\n4. 최소 2겹 이상 도포\n5. 충분한 건조 시간 확보 (최소 48시간)\n\n방수는 눈에 안 보이지만 가장 중요한 공정입니다. 절대 아끼면 안 되는 부분이에요.',
-    author: '방수마스터',
-    createdAt: '2026-02-25T10:00:00',
-    views: 1523,
-    likes: 89,
-    commentCount: 23,
-  },
-  {
-    id: 'post-2',
-    category: '질문답변',
-    title: '32평 아파트 리모델링 예산이 어느 정도 필요할까요?',
-    content: '안녕하세요, 강남구 32평 아파트 리모델링을 계획하고 있습니다.\n\n- 욕실 2곳 전체 교체\n- 주방 리모델링\n- 전체 도배, 장판\n- 거실 바닥 마루로 교체\n\n대략적인 예산이 어느 정도 필요한지 궁금합니다. 업체마다 견적이 너무 다르네요.',
-    author: '인테리어초보',
-    createdAt: '2026-02-26T08:30:00',
-    views: 876,
-    likes: 34,
-    commentCount: 45,
-  },
-  {
-    id: 'post-4',
-    category: '자유게시판',
-    title: '드디어 셀프 인테리어 완성! 후기 공유합니다',
-    content: '3개월에 걸쳐 24평 아파트 셀프 인테리어를 완성했습니다!\n\n직접 한 작업:\n- 도배 (실크 벽지)\n- 페인트 (거실 포인트 월)\n- 조명 교체\n- 몰딩 시공\n\n업체에 맡긴 작업:\n- 욕실 방수 + 타일\n- 전기 작업\n- 싱크대 교체\n\n총 비용 약 2,000만원 들었습니다. 업체 올수리보다 약 800만원 절약!',
-    author: '셀프인테리어',
-    createdAt: '2026-02-23T18:00:00',
-    views: 2341,
-    likes: 156,
-    commentCount: 67,
-  },
-];
+export const communityPosts: CommunityPost[] = [];

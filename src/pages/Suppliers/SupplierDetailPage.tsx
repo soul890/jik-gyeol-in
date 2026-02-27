@@ -2,7 +2,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { ArrowLeft, MapPin, Package, Truck, Banknote, MessageCircle, X, Flag } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
-import { suppliers as staticSuppliers } from '@/data/suppliers';
 import { categories } from '@/data/categories';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -27,13 +26,6 @@ export function SupplierDetailPage() {
   const [chatLoading, setChatLoading] = useState(false);
 
   useEffect(() => {
-    const staticMatch = staticSuppliers.find((s) => s.id === id);
-    if (staticMatch) {
-      setSupplier(staticMatch);
-      setLoading(false);
-      return;
-    }
-
     if (!id) {
       setLoading(false);
       return;
