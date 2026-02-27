@@ -13,6 +13,7 @@ export function SignupPage() {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [address, setAddress] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -22,6 +23,10 @@ export function SignupPage() {
 
     if (!nickname.trim()) {
       setError('닉네임을 입력해주세요.');
+      return;
+    }
+    if (!agreeTerms) {
+      setError('이용약관 및 개인정보처리방침에 동의해주세요.');
       return;
     }
     if (password !== passwordConfirm) {
@@ -116,7 +121,20 @@ export function SignupPage() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
-            <Button type="submit" className="w-full" disabled={submitting}>
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreeTerms}
+                onChange={(e) => setAgreeTerms(e.target.checked)}
+                className="mt-1 w-4 h-4 rounded border-warm-300 text-primary-500 focus:ring-primary-500 cursor-pointer"
+              />
+              <span className="text-sm text-warm-600">
+                <Link to="/terms" target="_blank" className="text-primary-600 hover:underline">이용약관</Link> 및{' '}
+                <Link to="/privacy" target="_blank" className="text-primary-600 hover:underline">개인정보처리방침</Link>에
+                동의합니다.
+              </span>
+            </label>
+            <Button type="submit" className="w-full" disabled={submitting || !agreeTerms}>
               {submitting ? '가입 중...' : '회원가입'}
             </Button>
           </form>

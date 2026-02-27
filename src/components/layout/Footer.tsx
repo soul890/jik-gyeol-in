@@ -47,6 +47,11 @@ export function Footer() {
               <li>이메일: support@jikgyeolin.kr</li>
               <li>전화: 02-1234-5678</li>
               <li>운영시간: 평일 09:00~18:00</li>
+              <li className="pt-2 border-t border-warm-700">
+                <Link to="/terms" className="hover:text-white transition-colors">이용약관</Link>
+                <span className="mx-2 text-warm-600">|</span>
+                <Link to="/privacy" className="hover:text-white transition-colors">개인정보처리방침</Link>
+              </li>
             </ul>
           </div>
         </div>
