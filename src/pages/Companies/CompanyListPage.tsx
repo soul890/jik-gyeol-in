@@ -62,11 +62,14 @@ export function CompanyListPage() {
       </div>
 
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((company) => (
-            <CompanyCard key={company.id} company={company} />
-          ))}
-        </div>
+        <>
+          <p className="text-sm text-warm-500 mb-4">{filtered.length}개의 업체</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
+            {filtered.map((company) => (
+              <CompanyCard key={company.id} company={company} />
+            ))}
+          </div>
+        </>
       ) : (
         <EmptyState title="등록된 업체가 없습니다" description="검색 조건을 변경해보세요." />
       )}

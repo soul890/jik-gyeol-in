@@ -36,7 +36,7 @@ export function RecommendedCompanies() {
         linkTo="/companies"
         linkText="전체보기"
       />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
         {topCompanies.map((company) => (
           <CompanyCard key={company.id} company={company} />
         ))}
