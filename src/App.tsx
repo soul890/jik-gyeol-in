@@ -25,6 +25,8 @@ const PaymentSuccessPage = lazy(() => import('@/pages/Payment/PaymentSuccessPage
 const PaymentFailPage = lazy(() => import('@/pages/Payment/PaymentFailPage').then((m) => ({ default: m.PaymentFailPage })));
 const ChatListPage = lazy(() => import('@/pages/Chat/ChatListPage').then((m) => ({ default: m.ChatListPage })));
 const ChatRoomPage = lazy(() => import('@/pages/Chat/ChatRoomPage').then((m) => ({ default: m.ChatRoomPage })));
+const MyPage = lazy(() => import('@/pages/MyPage/MyPage').then((m) => ({ default: m.MyPage })));
+const NotFoundPage = lazy(() => import('@/pages/NotFound/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
 
 function PageLoader() {
   return (
@@ -62,6 +64,8 @@ const router = createBrowserRouter([
       { path: 'payment/fail', element: <Suspense fallback={<PageLoader />}><PaymentFailPage /></Suspense> },
       { path: 'chat', element: <Suspense fallback={<PageLoader />}><ChatListPage /></Suspense> },
       { path: 'chat/:roomId', element: <Suspense fallback={<PageLoader />}><ChatRoomPage /></Suspense> },
+      { path: 'mypage', element: <Suspense fallback={<PageLoader />}><MyPage /></Suspense> },
+      { path: '*', element: <Suspense fallback={<PageLoader />}><NotFoundPage /></Suspense> },
     ],
   },
 ]);

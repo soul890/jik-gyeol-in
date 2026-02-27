@@ -72,7 +72,7 @@ export function Header() {
           <div className="hidden md:flex items-center gap-2">
             {loading ? null : user ? (
               <>
-                <span className="flex items-center gap-1 text-sm text-warm-600">
+                <Link to="/mypage" className="flex items-center gap-1 text-sm text-warm-600 hover:text-warm-800 transition-colors">
                   <User className="w-4 h-4" />
                   {profile?.nickname || user.email}
                   {isPro && (
@@ -80,7 +80,7 @@ export function Header() {
                       Pro
                     </span>
                   )}
-                </span>
+                </Link>
                 <Link
                   to="/chat"
                   className="relative flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-warm-600 hover:text-warm-800 hover:bg-warm-100 transition-colors"
@@ -161,7 +161,11 @@ export function Header() {
             <div className="border-t border-warm-200 mt-2 pt-2">
               {loading ? null : user ? (
                 <>
-                  <div className="flex items-center gap-1 px-3 py-2.5 text-sm text-warm-600">
+                  <Link
+                    to="/mypage"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-1 px-3 py-2.5 text-sm text-warm-600 hover:bg-warm-100 rounded-lg transition-colors"
+                  >
                     <User className="w-4 h-4" />
                     {profile?.nickname || user.email}
                     {isPro && (
@@ -169,7 +173,7 @@ export function Header() {
                         Pro
                       </span>
                     )}
-                  </div>
+                  </Link>
                   <Link
                     to="/chat"
                     onClick={() => setMobileOpen(false)}

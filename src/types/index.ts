@@ -22,6 +22,7 @@ export interface Job {
   views: number;
   isUrgent?: boolean;
   images?: string[];
+  uid?: string;
 }
 
 export interface Review {
@@ -52,6 +53,7 @@ export interface Company {
   portfolioImages?: string[];
   businessLicenseUrl?: string;
   reviews?: Review[];
+  uid?: string;
 }
 
 export interface Supplier {
@@ -69,6 +71,7 @@ export interface Supplier {
   deliveryInfo: string;
   createdAt: string;
   images?: string[];
+  uid?: string;
 }
 
 export type SubscriptionPlan = 'free' | 'pro' | 'business';
@@ -118,4 +121,5 @@ export interface CommunityPost {
   likes: number;
   commentCount: number;
   images?: string[];
+  uid?: string;
 }
