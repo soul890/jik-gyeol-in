@@ -1,12 +1,14 @@
 import { useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { ArrowLeft, Eye, ThumbsUp, MessageCircle, User, X } from 'lucide-react';
+import { ArrowLeft, Eye, ThumbsUp, MessageCircle, User, X, Flag } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { communityPosts as staticPosts } from '@/data/communityPosts';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { db } from '@/lib/firebase';
+import { useAuth } from '@/contexts/AuthContext';
+import { ReportModal } from '@/components/ReportModal';
 import { formatDate } from '@/utils/format';
 import type { CommunityPost } from '@/types';
 
@@ -18,9 +20,11 @@ const categoryVariant: Record<string, 'primary' | 'accent' | 'default'> = {
 
 export function PostDetailPage() {
   const { id } = useParams();
+  const { user } = useAuth();
   const [post, setPost] = useState<CommunityPost | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [showReport, setShowReport] = useState(false);
 
   useEffect(() => {
     const staticMatch = staticPosts.find((p) => p.id === id);
@@ -149,6 +153,29 @@ export function PostDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* 신고 버튼 */}
+      {user && post && (
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => setShowReport(true)}
+            className="inline-flex items-center gap-1.5 text-sm text-warm-400 hover:text-red-500 transition-colors cursor-pointer"
+          >
+            <Flag className="w-3.5 h-3.5" />
+            이 게시글 신고하기
+          </button>
+        </div>
+      )}
+
+      {post && (
+        <ReportModal
+          isOpen={showReport}
+          onClose={() => setShowReport(false)}
+          targetType="post"
+          targetId={post.id}
+          targetTitle={post.title}
+        />
+      )}
 
       {/* 이미지 라이트박스 */}
       {lightboxUrl && (

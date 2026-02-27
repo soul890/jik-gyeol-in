@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { ArrowLeft, MapPin, Package, Truck, Banknote, MessageCircle, X } from 'lucide-react';
+import { ArrowLeft, MapPin, Package, Truck, Banknote, MessageCircle, X, Flag } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { suppliers as staticSuppliers } from '@/data/suppliers';
 import { categories } from '@/data/categories';
@@ -11,6 +11,7 @@ import { Rating } from '@/components/ui/Rating';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginPromptModal } from '@/components/LoginPromptModal';
+import { ReportModal } from '@/components/ReportModal';
 import { findOrCreateChatRoom } from '@/utils/chat';
 import type { Supplier } from '@/types';
 
@@ -22,6 +23,7 @@ export function SupplierDetailPage() {
   const [loading, setLoading] = useState(true);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
 
   useEffect(() => {
@@ -188,9 +190,28 @@ export function SupplierDetailPage() {
                 {chatLoading ? '채팅방 연결 중...' : '채팅으로 상담하기'}
               </button>
             )}
+            {user && (
+              <button
+                onClick={() => setShowReport(true)}
+                className="flex items-center justify-center gap-1.5 w-full py-2.5 text-sm text-warm-400 hover:text-red-500 transition-colors cursor-pointer mt-2"
+              >
+                <Flag className="w-3.5 h-3.5" />
+                신고하기
+              </button>
+            )}
           </div>
         </CardContent>
       </Card>
+
+      {supplier && (
+        <ReportModal
+          isOpen={showReport}
+          onClose={() => setShowReport(false)}
+          targetType="supplier"
+          targetId={supplier.id}
+          targetTitle={supplier.name}
+        />
+      )}
 
       {/* 이미지 라이트박스 */}
       {lightboxUrl && (

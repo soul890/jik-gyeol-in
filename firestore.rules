@@ -40,6 +40,18 @@ service cloud.firestore {
         && resource.data.uid == request.auth.uid;
     }
 
+    // ── 신고 ──
+    match /reports/{reportId} {
+      allow create: if request.auth != null
+        && request.resource.data.reporterUid == request.auth.uid;
+      allow read: if request.auth != null
+        && (resource.data.reporterUid == request.auth.uid
+            || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow update: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow delete: if false;
+    }
+
     // ── 문의 (레거시) ──
     match /inquiries/{inquiryId} {
       allow create: if true;
