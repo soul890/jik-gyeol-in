@@ -18,6 +18,7 @@ export interface UserProfile {
   nickname: string;
   address: string;
   email: string;
+  role?: 'admin' | 'user';
   subscription?: Subscription;
   usage?: UsageTracking;
 }

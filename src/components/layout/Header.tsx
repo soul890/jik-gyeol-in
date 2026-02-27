@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User, Sparkles, MessageCircle, Search, Bell } from 'lucide-react';
+import { Menu, X, LogOut, User, Sparkles, MessageCircle, Search, Bell, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -187,6 +187,15 @@ export function Header() {
                   <MessageCircle className="w-4 h-4" />
                   채팅
                 </Link>
+                {profile?.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Shield className="w-4 h-4" />
+                    관리
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-warm-600 hover:text-warm-800 hover:bg-warm-100 transition-colors cursor-pointer"
@@ -295,6 +304,16 @@ export function Header() {
                       </span>
                     )}
                   </Link>
+                  {profile?.role === 'admin' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-1 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                    >
+                      <Shield className="w-4 h-4" />
+                      관리자
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="flex items-center gap-1 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-warm-600 hover:bg-warm-100 transition-colors cursor-pointer"

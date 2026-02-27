@@ -28,6 +28,7 @@ const ChatListPage = lazy(() => import('@/pages/Chat/ChatListPage').then((m) => 
 const ChatRoomPage = lazy(() => import('@/pages/Chat/ChatRoomPage').then((m) => ({ default: m.ChatRoomPage })));
 const MyPage = lazy(() => import('@/pages/MyPage/MyPage').then((m) => ({ default: m.MyPage })));
 const SearchPage = lazy(() => import('@/pages/Search/SearchPage').then((m) => ({ default: m.SearchPage })));
+const AdminPage = lazy(() => import('@/pages/Admin/AdminPage').then((m) => ({ default: m.AdminPage })));
 const TermsPage = lazy(() => import('@/pages/Legal/TermsPage').then((m) => ({ default: m.TermsPage })));
 const PrivacyPage = lazy(() => import('@/pages/Legal/PrivacyPage').then((m) => ({ default: m.PrivacyPage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFound/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
@@ -84,6 +85,7 @@ const router = createBrowserRouter([
       { path: 'chat', element: <Protected><ChatListPage /></Protected> },
       { path: 'chat/:roomId', element: <Protected><ChatRoomPage /></Protected> },
       { path: 'mypage', element: <Protected><MyPage /></Protected> },
+      { path: 'admin', element: <Protected><AdminPage /></Protected> },
     ],
   },
 ]);
