@@ -47,6 +47,8 @@ export function SupplierDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const isOwnListing = !!user && !!supplier?.uid && supplier.uid === user.uid;
+
   const handleStartChat = async () => {
     if (!supplier) return;
     if (!user) {
@@ -58,7 +60,7 @@ export function SupplierDetailPage() {
       const roomId = await findOrCreateChatRoom({
         currentUserId: user.uid,
         currentUserName: profile?.nickname || user.email || '사용자',
-        otherUserId: `listing-supplier-${supplier.id}`,
+        otherUserId: supplier.uid || `listing-supplier-${supplier.id}`,
         otherUserName: supplier.name,
         context: { type: 'supplier', id: supplier.id, title: supplier.name },
       });
@@ -174,14 +176,18 @@ export function SupplierDetailPage() {
           )}
 
           <div className="pt-6 border-t border-warm-200">
-            <button
-              onClick={handleStartChat}
-              disabled={chatLoading}
-              className="flex items-center justify-center gap-2 w-full py-3.5 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-semibold rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed"
-            >
-              <MessageCircle className="w-5 h-5" />
-              {chatLoading ? '채팅방 연결 중...' : '채팅으로 상담하기'}
-            </button>
+            {isOwnListing ? (
+              <div className="text-center text-sm text-warm-400 py-3">내가 등록한 업체입니다</div>
+            ) : (
+              <button
+                onClick={handleStartChat}
+                disabled={chatLoading}
+                className="flex items-center justify-center gap-2 w-full py-3.5 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-semibold rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed"
+              >
+                <MessageCircle className="w-5 h-5" />
+                {chatLoading ? '채팅방 연결 중...' : '채팅으로 상담하기'}
+              </button>
+            )}
           </div>
         </CardContent>
       </Card>

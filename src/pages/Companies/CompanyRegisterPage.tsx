@@ -13,9 +13,11 @@ import { categories } from '@/data/categories';
 import { db, storage } from '@/lib/firebase';
 import { cn } from '@/utils/cn';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function CompanyRegisterPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { maxPortfolioImages } = useSubscription();
   const [showSuccess, setShowSuccess] = useState(false);
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
@@ -71,6 +73,7 @@ export function CompanyRegisterPage() {
       }
 
       await addDoc(collection(db, 'companies'), {
+        uid: user?.uid || '',
         name,
         description: desc,
         categories: selectedCats,

@@ -10,9 +10,11 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { FileUpload } from '@/components/ui/FileUpload';
 import { db } from '@/lib/firebase';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function PostWritePage() {
   const navigate = useNavigate();
+  const { user, profile } = useAuth();
   const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     category: '시공노하우',
@@ -25,7 +27,8 @@ export function PostWritePage() {
     try {
       await addDoc(collection(db, 'communityPosts'), {
         ...formData,
-        author: '익명',
+        uid: user?.uid || '',
+        author: profile?.nickname || '익명',
         createdAt: serverTimestamp(),
         views: 0,
         likes: 0,

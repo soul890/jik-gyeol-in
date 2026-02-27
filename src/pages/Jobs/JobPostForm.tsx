@@ -11,9 +11,11 @@ import { FileUpload } from '@/components/ui/FileUpload';
 import { categories } from '@/data/categories';
 import { Modal } from '@/components/ui/Modal';
 import { db } from '@/lib/firebase';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function JobPostForm() {
   const navigate = useNavigate();
+  const { user, profile } = useAuth();
   const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     type: '구인',
@@ -35,7 +37,8 @@ export function JobPostForm() {
     try {
       await addDoc(collection(db, 'jobs'), {
         ...formData,
-        author: '익명',
+        uid: user?.uid || '',
+        author: profile?.nickname || '익명',
         createdAt: serverTimestamp(),
         views: 0,
         isUrgent: false,

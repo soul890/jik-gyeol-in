@@ -12,28 +12,32 @@ service cloud.firestore {
     match /jobs/{jobId} {
       allow read: if true;
       allow create: if request.auth != null;
-      allow update, delete: if request.auth != null;
+      allow update, delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
     }
 
     // ── 인테리어 업체 ──
     match /companies/{companyId} {
       allow read: if true;
       allow create: if request.auth != null;
-      allow update, delete: if request.auth != null;
+      allow update, delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
     }
 
     // ── 자재업체 ──
     match /suppliers/{supplierId} {
       allow read: if true;
       allow create: if request.auth != null;
-      allow update, delete: if request.auth != null;
+      allow update, delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
     }
 
     // ── 커뮤니티 게시글 ──
     match /communityPosts/{postId} {
       allow read: if true;
       allow create: if request.auth != null;
-      allow update, delete: if request.auth != null;
+      allow update, delete: if request.auth != null
+        && resource.data.uid == request.auth.uid;
     }
 
     // ── 문의 (레거시) ──

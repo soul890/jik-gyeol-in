@@ -47,6 +47,8 @@ export function JobDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const isOwnListing = !!user && !!job?.uid && job.uid === user.uid;
+
   const handleStartChat = async () => {
     if (!job) return;
     if (!user) {
@@ -58,7 +60,7 @@ export function JobDetailPage() {
       const roomId = await findOrCreateChatRoom({
         currentUserId: user.uid,
         currentUserName: profile?.nickname || user.email || '사용자',
-        otherUserId: `listing-job-${job.id}`,
+        otherUserId: job.uid || `listing-job-${job.id}`,
         otherUserName: job.author,
         context: { type: 'job', id: job.id, title: job.title },
       });
@@ -165,14 +167,18 @@ export function JobDetailPage() {
           )}
 
           <div className="pt-6 border-t border-warm-200">
-            <button
-              onClick={handleStartChat}
-              disabled={chatLoading}
-              className="flex items-center justify-center gap-2 w-full py-3.5 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-semibold rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed"
-            >
-              <MessageCircle className="w-5 h-5" />
-              {chatLoading ? '채팅방 연결 중...' : '채팅으로 상담하기'}
-            </button>
+            {isOwnListing ? (
+              <div className="text-center text-sm text-warm-400 py-3">내가 작성한 글입니다</div>
+            ) : (
+              <button
+                onClick={handleStartChat}
+                disabled={chatLoading}
+                className="flex items-center justify-center gap-2 w-full py-3.5 bg-primary-500 hover:bg-primary-600 disabled:bg-primary-300 text-white font-semibold rounded-xl transition-colors cursor-pointer disabled:cursor-not-allowed"
+              >
+                <MessageCircle className="w-5 h-5" />
+                {chatLoading ? '채팅방 연결 중...' : '채팅으로 상담하기'}
+              </button>
+            )}
           </div>
         </CardContent>
       </Card>
