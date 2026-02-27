@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, LogOut, User, Sparkles, MessageCircle } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, LogOut, User, Sparkles, MessageCircle, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useUnreadCount } from '@/hooks/useUnreadCount';
@@ -18,13 +18,26 @@ const navItems = [
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { user, profile, loading, logout } = useAuth();
   const { isPro } = useSubscription();
   const unreadCount = useUnreadCount();
 
   const handleLogout = async () => {
     await logout();
+    setMobileOpen(false);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    navigate(`/search?q=${encodeURIComponent(q)}`);
+    setSearchQuery('');
+    setSearchOpen(false);
     setMobileOpen(false);
   };
 
@@ -70,6 +83,28 @@ export function Header() {
           </nav>
 
           <div className="hidden md:flex items-center gap-2">
+            {/* 검색 */}
+            {searchOpen ? (
+              <form onSubmit={handleSearch} className="flex items-center">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="검색어를 입력하세요"
+                  autoFocus
+                  className="w-48 px-3 py-1.5 text-sm border border-warm-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300"
+                  onBlur={() => { if (!searchQuery) setSearchOpen(false); }}
+                />
+              </form>
+            ) : (
+              <button
+                onClick={() => setSearchOpen(true)}
+                className="p-2 rounded-lg text-warm-500 hover:text-warm-700 hover:bg-warm-100 transition-colors cursor-pointer"
+              >
+                <Search className="w-4.5 h-4.5" />
+              </button>
+            )}
+
             {loading ? null : user ? (
               <>
                 <Link to="/mypage" className="flex items-center gap-1 text-sm text-warm-600 hover:text-warm-800 transition-colors">
@@ -131,6 +166,20 @@ export function Header() {
       {mobileOpen && (
         <div className="md:hidden border-t border-warm-200 bg-white">
           <nav className="px-4 py-3 space-y-1">
+            {/* 모바일 검색 */}
+            <form onSubmit={handleSearch} className="mb-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-warm-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="통합 검색"
+                  className="w-full pl-9 pr-3 py-2.5 text-sm border border-warm-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 bg-warm-50"
+                />
+              </div>
+            </form>
+
             {navItems.map((item) => {
               const isActive =
                 item.path === '/'
