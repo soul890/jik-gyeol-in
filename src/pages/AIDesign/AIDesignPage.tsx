@@ -44,8 +44,8 @@ interface AnalysisResult {
 // ── Component ───────────────────────────────────────────────────────
 
 export function AIDesignPage() {
-  const { user, refreshProfile } = useAuth();
-  const { isLoggedIn, canUseAIDesign } = useSubscription();
+  const { user, profile, refreshProfile } = useAuth();
+  const { isLoggedIn, canUseAIDesign, aiDesignUsed, aiDesignLimit } = useSubscription();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSubModal, setShowSubModal] = useState(false);
 
@@ -134,12 +134,26 @@ export function AIDesignPage() {
       setGeneratedImage(data.generatedImage);
       setAnalysis(data.analysis);
 
-      // Increment usage count
+      // Increment usage count + 월 리셋 처리
       if (user) {
         const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, {
-          'usage.aiDesignCount': increment(1),
-        }).catch(() => {});
+        const now = new Date();
+        const lastReset = profile?.usage?.lastResetDate;
+        const isSameMonth = lastReset
+          && new Date(lastReset).getFullYear() === now.getFullYear()
+          && new Date(lastReset).getMonth() === now.getMonth();
+
+        if (isSameMonth) {
+          await updateDoc(userRef, {
+            'usage.aiDesignCount': increment(1),
+          }).catch(() => {});
+        } else {
+          // 새 달이면 카운트를 1로 리셋
+          await updateDoc(userRef, {
+            'usage.aiDesignCount': 1,
+            'usage.lastResetDate': now.toISOString(),
+          }).catch(() => {});
+        }
         refreshProfile();
       }
     } catch (err) {
@@ -196,6 +210,11 @@ export function AIDesignPage() {
             현재 방 사진을 업로드하고 원하는 스타일을 선택하면,
             AI가 구조를 유지한 채 실사 수준의 인테리어 변환 이미지를 생성합니다.
           </p>
+          {isLoggedIn && (
+            <p className="text-sm text-warm-400 mt-2">
+              이번 달 사용: <span className="font-semibold text-warm-600">{aiDesignUsed}</span> / {aiDesignLimit}회
+            </p>
+          )}
 
           {/* Stepper */}
           <div className="flex items-center gap-2 mt-8">

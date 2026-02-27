@@ -10,12 +10,12 @@ interface SubscriptionModalProps {
 }
 
 const triggerMessages = {
-  'ai-design': '무료 플랜의 AI 디자인 1회 사용을 모두 소진했습니다.',
+  'ai-design': '이번 달 AI 디자인 사용 횟수를 모두 소진했습니다. 더 많은 횟수가 필요하시면 업그레이드해 주세요.',
   'portfolio': '무료 플랜은 포트폴리오 사진을 최대 3장까지 업로드할 수 있습니다.',
 };
 
 const proBenefits = [
-  'AI 인테리어 디자인 무제한 사용',
+  'AI 인테리어 디자인 월 30회 사용',
   '포트폴리오 사진 최대 20장',
   '검색 결과 상단 노출',
   '프로 인증 뱃지',

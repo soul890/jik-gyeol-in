@@ -6,9 +6,9 @@ import { Card } from '@/components/ui/Card';
 
 interface PlanFeature {
   text: string;
-  free: boolean;
-  pro: boolean;
-  business: boolean;
+  free: boolean | string;
+  pro: boolean | string;
+  business: boolean | string;
 }
 
 const features: PlanFeature[] = [
@@ -16,6 +16,7 @@ const features: PlanFeature[] = [
   { text: '연락처 공개 (전화/이메일)', free: true, pro: true, business: true },
   { text: '구인구직 글 등록', free: true, pro: true, business: true },
   { text: '커뮤니티 이용', free: true, pro: true, business: true },
+  { text: 'AI 인테리어 디자인', free: '월 3회', pro: '월 30회', business: '월 50회' },
   { text: '포트폴리오 사진 (최대 3장)', free: true, pro: true, business: true },
   { text: '검색 결과 상단 노출', free: false, pro: true, business: true },
   { text: '프로 인증 뱃지', free: false, pro: true, business: true },
@@ -133,7 +134,10 @@ export function PricingPage() {
               {features.filter((f) => f.free).map((f) => (
                 <li key={f.text} className="flex items-start gap-2 text-sm">
                   <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                  <span className="text-warm-700">{f.text}</span>
+                  <span className="text-warm-700">
+                    {f.text}
+                    {typeof f.free === 'string' && <span className="text-primary-500 font-medium ml-1">({f.free})</span>}
+                  </span>
                 </li>
               ))}
               {features.filter((f) => !f.free).slice(0, 3).map((f) => (
@@ -178,7 +182,10 @@ export function PricingPage() {
               {features.filter((f) => f.pro).map((f) => (
                 <li key={f.text} className="flex items-start gap-2 text-sm">
                   <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                  <span className="text-warm-700">{f.text}</span>
+                  <span className="text-warm-700">
+                    {f.text}
+                    {typeof f.pro === 'string' && <span className="text-primary-500 font-medium ml-1">({f.pro})</span>}
+                  </span>
                 </li>
               ))}
               {features.filter((f) => !f.pro).slice(0, 2).map((f) => (
@@ -217,7 +224,10 @@ export function PricingPage() {
               {features.filter((f) => f.business).map((f) => (
                 <li key={f.text} className="flex items-start gap-2 text-sm">
                   <Check className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                  <span className="text-warm-700">{f.text}</span>
+                  <span className="text-warm-700">
+                    {f.text}
+                    {typeof f.business === 'string' && <span className="text-primary-500 font-medium ml-1">({f.business})</span>}
+                  </span>
                 </li>
               ))}
             </ul>
