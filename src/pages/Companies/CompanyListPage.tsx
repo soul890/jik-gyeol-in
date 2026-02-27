@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
-import { companies as staticCompanies } from '@/data/companies';
 import { CompanyCard } from '@/components/common/CompanyCard';
 import { CategoryFilter } from '@/components/common/CategoryFilter';
 import { SearchBar } from '@/components/ui/SearchBar';
@@ -32,11 +31,7 @@ export function CompanyListPage() {
       });
   }, []);
 
-  const allCompanies = useMemo(() => {
-    const firestoreIds = new Set(firestoreCompanies.map((d) => d.id));
-    const uniqueStatic = staticCompanies.filter((d) => !firestoreIds.has(d.id));
-    return [...firestoreCompanies, ...uniqueStatic];
-  }, [firestoreCompanies]);
+  const allCompanies = firestoreCompanies;
 
   const filtered = useMemo(() => {
     return allCompanies.filter((c) => {

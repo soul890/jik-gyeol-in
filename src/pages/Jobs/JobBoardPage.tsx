@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
-import { jobs as staticJobs } from '@/data/jobs';
 import { JobCard } from '@/components/common/JobCard';
 import { CategoryFilter } from '@/components/common/CategoryFilter';
 import { SearchBar } from '@/components/ui/SearchBar';
@@ -43,11 +42,7 @@ export function JobBoardPage() {
       .catch(() => {});
   }, []);
 
-  const allJobs = useMemo(() => {
-    const firestoreIds = new Set(firestoreJobs.map((d) => d.id));
-    const uniqueStatic = staticJobs.filter((d) => !firestoreIds.has(d.id));
-    return [...firestoreJobs, ...uniqueStatic];
-  }, [firestoreJobs]);
+  const allJobs = firestoreJobs;
 
   const filtered = useMemo(() => {
     return allJobs.filter((job) => {

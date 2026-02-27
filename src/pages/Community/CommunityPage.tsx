@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PenSquare } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
-import { communityPosts as staticPosts } from '@/data/communityPosts';
 import { CommunityPostCard } from '@/components/common/CommunityPostCard';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { Tabs } from '@/components/ui/Tabs';
@@ -37,11 +36,7 @@ export function CommunityPage() {
       .catch(() => {});
   }, []);
 
-  const allPosts = useMemo(() => {
-    const firestoreIds = new Set(firestorePosts.map((d) => d.id));
-    const uniqueStatic = staticPosts.filter((d) => !firestoreIds.has(d.id));
-    return [...firestorePosts, ...uniqueStatic];
-  }, [firestorePosts]);
+  const allPosts = firestorePosts;
 
   const filtered = useMemo(() => {
     return allPosts.filter((post) => {

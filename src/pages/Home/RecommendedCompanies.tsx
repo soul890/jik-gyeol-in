@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
-import { companies as staticCompanies } from '@/data/companies';
 import { CompanyCard } from '@/components/common/CompanyCard';
 import { SectionHeader } from '@/components/common/SectionHeader';
 import { db } from '@/lib/firebase';
@@ -22,9 +21,7 @@ export function RecommendedCompanies() {
   }, []);
 
   const topCompanies = useMemo(() => {
-    const firestoreIds = new Set(firestoreCompanies.map((d) => d.id));
-    const uniqueStatic = staticCompanies.filter((d) => !firestoreIds.has(d.id));
-    return [...firestoreCompanies, ...uniqueStatic]
+    return [...firestoreCompanies]
       .sort((a, b) => b.rating - a.rating)
       .slice(0, 3);
   }, [firestoreCompanies]);

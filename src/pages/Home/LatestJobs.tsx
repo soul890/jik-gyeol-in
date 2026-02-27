@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
-import { jobs as staticJobs } from '@/data/jobs';
 import { JobCard } from '@/components/common/JobCard';
 import { SectionHeader } from '@/components/common/SectionHeader';
 import { db } from '@/lib/firebase';
@@ -22,9 +21,7 @@ export function LatestJobs() {
   }, []);
 
   const latestJobs = useMemo(() => {
-    const firestoreIds = new Set(firestoreJobs.map((d) => d.id));
-    const uniqueStatic = staticJobs.filter((d) => !firestoreIds.has(d.id));
-    return [...firestoreJobs, ...uniqueStatic]
+    return [...firestoreJobs]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 3);
   }, [firestoreJobs]);

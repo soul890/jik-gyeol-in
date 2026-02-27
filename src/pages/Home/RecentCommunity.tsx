@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
-import { communityPosts as staticPosts } from '@/data/communityPosts';
 import { SectionHeader } from '@/components/common/SectionHeader';
 import { db } from '@/lib/firebase';
 import type { CommunityPost } from '@/types';
@@ -22,9 +21,7 @@ export function RecentCommunity() {
   }, []);
 
   const recentPosts = useMemo(() => {
-    const firestoreIds = new Set(firestorePosts.map((d) => d.id));
-    const uniqueStatic = staticPosts.filter((d) => !firestoreIds.has(d.id));
-    return [...firestorePosts, ...uniqueStatic]
+    return [...firestorePosts]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 3);
   }, [firestorePosts]);

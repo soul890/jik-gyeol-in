@@ -9,10 +9,6 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { db } from '@/lib/firebase';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { formatDate } from '@/utils/format';
-import { jobs as staticJobs } from '@/data/jobs';
-import { companies as staticCompanies } from '@/data/companies';
-import { suppliers as staticSuppliers } from '@/data/suppliers';
-import { communityPosts as staticPosts } from '@/data/communityPosts';
 import type { Job, Company, Supplier, CommunityPost } from '@/types';
 
 type TabId = 'all' | 'jobs' | 'companies' | 'suppliers' | 'posts';
@@ -54,37 +50,10 @@ export function SearchPage() {
         getDocs(collection(db, 'communityPosts')).catch(() => null),
       ]);
 
-      const jobIds = new Set<string>();
-      const allJobs: Job[] = [];
-      jobSnap?.docs.forEach((d) => {
-        jobIds.add(d.id);
-        allJobs.push({ id: d.id, ...d.data() } as Job);
-      });
-      staticJobs.forEach((j) => { if (!jobIds.has(j.id)) allJobs.push(j); });
-
-      const companyIds = new Set<string>();
-      const allCompanies: Company[] = [];
-      companySnap?.docs.forEach((d) => {
-        companyIds.add(d.id);
-        allCompanies.push({ id: d.id, ...d.data() } as Company);
-      });
-      staticCompanies.forEach((c) => { if (!companyIds.has(c.id)) allCompanies.push(c); });
-
-      const supplierIds = new Set<string>();
-      const allSuppliers: Supplier[] = [];
-      supplierSnap?.docs.forEach((d) => {
-        supplierIds.add(d.id);
-        allSuppliers.push({ id: d.id, ...d.data() } as Supplier);
-      });
-      staticSuppliers.forEach((s) => { if (!supplierIds.has(s.id)) allSuppliers.push(s); });
-
-      const postIds = new Set<string>();
-      const allPosts: CommunityPost[] = [];
-      postSnap?.docs.forEach((d) => {
-        postIds.add(d.id);
-        allPosts.push({ id: d.id, ...d.data() } as CommunityPost);
-      });
-      staticPosts.forEach((p) => { if (!postIds.has(p.id)) allPosts.push(p); });
+      const allJobs: Job[] = jobSnap?.docs.map((d) => ({ id: d.id, ...d.data() } as Job)) ?? [];
+      const allCompanies: Company[] = companySnap?.docs.map((d) => ({ id: d.id, ...d.data() } as Company)) ?? [];
+      const allSuppliers: Supplier[] = supplierSnap?.docs.map((d) => ({ id: d.id, ...d.data() } as Supplier)) ?? [];
+      const allPosts: CommunityPost[] = postSnap?.docs.map((d) => ({ id: d.id, ...d.data() } as CommunityPost)) ?? [];
 
       setJobs(allJobs.filter((j) => matchQuery(j.title, q) || matchQuery(j.description, q) || matchQuery(j.location, q)));
       setCompanies(allCompanies.filter((c) => matchQuery(c.name, q) || matchQuery(c.description, q) || matchQuery(c.location, q)));

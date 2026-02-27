@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { collection, getDocs } from 'firebase/firestore';
-import { suppliers as staticSuppliers } from '@/data/suppliers';
 import { SupplierCard } from '@/components/common/SupplierCard';
 import { CategoryFilter } from '@/components/common/CategoryFilter';
 import { SearchBar } from '@/components/ui/SearchBar';
@@ -30,11 +29,7 @@ export function SupplierListPage() {
       .catch(() => {});
   }, []);
 
-  const allSuppliers = useMemo(() => {
-    const firestoreIds = new Set(firestoreSuppliers.map((d) => d.id));
-    const uniqueStatic = staticSuppliers.filter((d) => !firestoreIds.has(d.id));
-    return [...firestoreSuppliers, ...uniqueStatic];
-  }, [firestoreSuppliers]);
+  const allSuppliers = firestoreSuppliers;
 
   const filtered = useMemo(() => {
     return allSuppliers.filter((s) => {
