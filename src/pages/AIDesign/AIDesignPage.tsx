@@ -561,6 +561,9 @@ export function AIDesignPage() {
                       />
                     )}
                   </div>
+                  <p className="text-xs text-warm-400 mt-2 text-center">
+                    * AI가 생성한 참고 이미지이며, 실제 시공 결과와 차이가 있을 수 있습니다. 방의 구조와 시점이 원본과 다를 수 있습니다.
+                  </p>
                 </div>
 
                 {/* Analysis */}
