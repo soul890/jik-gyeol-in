@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -8,6 +8,8 @@ import { Card, CardContent } from '@/components/ui/Card';
 export function LoginPage() {
   const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string })?.from || '/';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,7 +21,7 @@ export function LoginPage() {
     setSubmitting(true);
     try {
       await login(email, password);
-      navigate('/');
+      navigate(from, { replace: true });
     } catch (err) {
       const code = (err as { code?: string }).code;
       if (code === 'auth/invalid-email') {
@@ -40,7 +42,7 @@ export function LoginPage() {
     setError('');
     try {
       await loginWithGoogle();
-      navigate('/');
+      navigate(from, { replace: true });
     } catch {
       setError('Google 로그인에 실패했습니다.');
     }

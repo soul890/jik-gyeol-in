@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
 const HomePage = lazy(() => import('@/pages/Home/HomePage').then((m) => ({ default: m.HomePage })));
 const JobBoardPage = lazy(() => import('@/pages/Jobs/JobBoardPage').then((m) => ({ default: m.JobBoardPage })));
@@ -36,36 +37,47 @@ function PageLoader() {
   );
 }
 
+function Protected({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <ProtectedRoute>{children}</ProtectedRoute>
+    </Suspense>
+  );
+}
+
 const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
     children: [
+      // 공개 페이지
       { index: true, element: <Suspense fallback={<PageLoader />}><HomePage /></Suspense> },
       { path: 'jobs', element: <Suspense fallback={<PageLoader />}><JobBoardPage /></Suspense> },
-      { path: 'jobs/new', element: <Suspense fallback={<PageLoader />}><JobPostForm /></Suspense> },
       { path: 'jobs/:id', element: <Suspense fallback={<PageLoader />}><JobDetailPage /></Suspense> },
       { path: 'companies', element: <Suspense fallback={<PageLoader />}><CompanyListPage /></Suspense> },
-      { path: 'companies/register', element: <Suspense fallback={<PageLoader />}><CompanyRegisterPage /></Suspense> },
       { path: 'companies/:id', element: <Suspense fallback={<PageLoader />}><CompanyDetailPage /></Suspense> },
       { path: 'suppliers', element: <Suspense fallback={<PageLoader />}><SupplierListPage /></Suspense> },
-      { path: 'suppliers/register', element: <Suspense fallback={<PageLoader />}><SupplierRegisterPage /></Suspense> },
       { path: 'suppliers/:id', element: <Suspense fallback={<PageLoader />}><SupplierDetailPage /></Suspense> },
       { path: 'community', element: <Suspense fallback={<PageLoader />}><CommunityPage /></Suspense> },
-      { path: 'community/write', element: <Suspense fallback={<PageLoader />}><PostWritePage /></Suspense> },
       { path: 'community/:id', element: <Suspense fallback={<PageLoader />}><PostDetailPage /></Suspense> },
       { path: 'pricing', element: <Suspense fallback={<PageLoader />}><PricingPage /></Suspense> },
       { path: 'login', element: <Suspense fallback={<PageLoader />}><LoginPage /></Suspense> },
       { path: 'signup', element: <Suspense fallback={<PageLoader />}><SignupPage /></Suspense> },
-      { path: 'experts/register', element: <Suspense fallback={<PageLoader />}><ExpertRegisterPage /></Suspense> },
-      { path: 'ai-design', element: <Suspense fallback={<PageLoader />}><AIDesignPage /></Suspense> },
-      { path: 'payment/checkout', element: <Suspense fallback={<PageLoader />}><CheckoutPage /></Suspense> },
       { path: 'payment/success', element: <Suspense fallback={<PageLoader />}><PaymentSuccessPage /></Suspense> },
       { path: 'payment/fail', element: <Suspense fallback={<PageLoader />}><PaymentFailPage /></Suspense> },
-      { path: 'chat', element: <Suspense fallback={<PageLoader />}><ChatListPage /></Suspense> },
-      { path: 'chat/:roomId', element: <Suspense fallback={<PageLoader />}><ChatRoomPage /></Suspense> },
-      { path: 'mypage', element: <Suspense fallback={<PageLoader />}><MyPage /></Suspense> },
       { path: '*', element: <Suspense fallback={<PageLoader />}><NotFoundPage /></Suspense> },
+
+      // 로그인 필요한 페이지
+      { path: 'jobs/new', element: <Protected><JobPostForm /></Protected> },
+      { path: 'companies/register', element: <Protected><CompanyRegisterPage /></Protected> },
+      { path: 'suppliers/register', element: <Protected><SupplierRegisterPage /></Protected> },
+      { path: 'community/write', element: <Protected><PostWritePage /></Protected> },
+      { path: 'experts/register', element: <Protected><ExpertRegisterPage /></Protected> },
+      { path: 'ai-design', element: <Protected><AIDesignPage /></Protected> },
+      { path: 'payment/checkout', element: <Protected><CheckoutPage /></Protected> },
+      { path: 'chat', element: <Protected><ChatListPage /></Protected> },
+      { path: 'chat/:roomId', element: <Protected><ChatRoomPage /></Protected> },
+      { path: 'mypage', element: <Protected><MyPage /></Protected> },
     ],
   },
 ]);
