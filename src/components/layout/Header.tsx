@@ -54,6 +54,7 @@ export function Header() {
             <span className="text-xl font-bold text-warm-800">
               직결<span className="text-accent">-</span>인
             </span>
+            <span className="px-1.5 py-0.5 bg-accent/10 text-accent text-[10px] font-bold rounded">BETA</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">

@@ -72,7 +72,7 @@ export function PricingPage() {
           <div className="absolute top-10 right-20 w-72 h-72 bg-accent rounded-full blur-3xl" />
         </div>
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center">
-          <Badge variant="accent" className="mb-4">중개 수수료 0원</Badge>
+          <Badge variant="accent" className="mb-4">BETA - 모든 기능 무료 체험</Badge>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-warm-900 mb-4 leading-tight">
             합리적인 요금,<br />
             <span className="text-accent">확실한 가치</span>
@@ -81,6 +81,9 @@ export function PricingPage() {
             건별 중개 수수료 없이 월 정액으로 이용하세요.<br />
             기존 플랫폼 매칭비 200~300만원 vs 직결-인 월 최대 49,900원
           </p>
+          <div className="mt-4 inline-block bg-amber-50 border border-amber-200 text-amber-700 text-sm rounded-lg px-4 py-2">
+            현재 베타 서비스 기간으로 모든 기능을 무료로 이용하실 수 있습니다. 유료 플랜은 정식 출시 후 오픈됩니다.
+          </div>
         </div>
       </section>
 
@@ -154,11 +157,10 @@ export function PricingPage() {
           </Card>
 
           {/* 프로 플랜 */}
-          <Card className="relative p-6 sm:p-8 flex flex-col border-2 border-primary-400 shadow-lg">
+          <Card className="relative p-6 sm:p-8 flex flex-col border-2 border-warm-200 opacity-75">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-              <Badge variant="accent" className="px-4 py-1 text-sm shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 mr-1" />
-                인기
+              <Badge className="px-4 py-1 text-sm shadow-sm bg-warm-400 text-white">
+                준비 중
               </Badge>
             </div>
 
@@ -196,14 +198,18 @@ export function PricingPage() {
               ))}
             </ul>
 
-            <Button className="w-full" onClick={() => handleSelect('프로')}>
-              프로 시작하기
-              <ArrowRight className="w-4 h-4" />
+            <Button className="w-full" disabled>
+              정식 출시 후 오픈
             </Button>
           </Card>
 
           {/* 비즈니스 플랜 */}
-          <Card className="relative p-6 sm:p-8 flex flex-col">
+          <Card className="relative p-6 sm:p-8 flex flex-col opacity-75">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+              <Badge className="px-4 py-1 text-sm shadow-sm bg-warm-400 text-white">
+                준비 중
+              </Badge>
+            </div>
             <div className="mb-6">
               <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-4">
                 <Building2 className="w-6 h-6 text-accent" />
@@ -232,9 +238,8 @@ export function PricingPage() {
               ))}
             </ul>
 
-            <Button variant="secondary" className="w-full" onClick={() => handleSelect('비즈니스')}>
-              비즈니스 시작하기
-              <ArrowRight className="w-4 h-4" />
+            <Button variant="secondary" className="w-full" disabled>
+              정식 출시 후 오픈
             </Button>
           </Card>
         </div>
