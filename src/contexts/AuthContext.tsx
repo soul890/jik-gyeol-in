@@ -10,7 +10,7 @@ import {
   sendEmailVerification,
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import type { Subscription, UsageTracking } from '@/types';
 
@@ -48,6 +48,8 @@ async function fetchProfile(uid: string): Promise<UserProfile | null> {
   return snap.exists() ? (snap.data() as UserProfile) : null;
 }
 
+const ADMIN_EMAILS = ['soul8904@gmail.com'];
+
 const googleProvider = new GoogleAuthProvider();
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -59,7 +61,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
-        const p = await fetchProfile(u.uid).catch(() => null);
+        let p = await fetchProfile(u.uid).catch(() => null);
+        // 관리자 이메일이면 자동으로 admin 권한 부여
+        if (p && ADMIN_EMAILS.includes(u.email ?? '') && p.role !== 'admin') {
+          await updateDoc(doc(db, 'users', u.uid), { role: 'admin' }).catch(() => {});
+          p = { ...p, role: 'admin' };
+        }
         setProfile(p);
       } else {
         setProfile(null);
