@@ -23,7 +23,8 @@ export function LoginPage() {
 
   // 아이디 찾기
   const [findIdOpen, setFindIdOpen] = useState(false);
-  const [findIdNickname, setFindIdNickname] = useState('');
+  const [findIdMethod, setFindIdMethod] = useState<'nickname' | 'phone'>('nickname');
+  const [findIdValue, setFindIdValue] = useState('');
   const [findIdResult, setFindIdResult] = useState<string | null>(null);
   const [findIdLoading, setFindIdLoading] = useState(false);
   const [findIdError, setFindIdError] = useState('');
@@ -70,20 +71,24 @@ export function LoginPage() {
 
   const handleFindId = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!findIdNickname.trim()) return;
+    if (!findIdValue.trim()) return;
     setFindIdError('');
     setFindIdResult(null);
     setFindIdLoading(true);
     try {
+      const field = findIdMethod === 'nickname' ? 'nickname' : 'phone';
       const snap = await getDocs(
-        query(collection(db, 'users'), where('nickname', '==', findIdNickname.trim())),
+        query(collection(db, 'users'), where(field, '==', findIdValue.trim())),
       );
       if (snap.empty) {
-        setFindIdError('해당 닉네임으로 등록된 계정을 찾을 수 없습니다.');
+        setFindIdError(
+          findIdMethod === 'nickname'
+            ? '해당 닉네임으로 등록된 계정을 찾을 수 없습니다.'
+            : '해당 휴대폰 번호로 등록된 계정을 찾을 수 없습니다.',
+        );
       } else {
         const userData = snap.docs[0].data();
         const foundEmail = userData.email as string;
-        // 이메일 일부 마스킹 (abc@gmail.com → a**@gmail.com)
         const [local, domain] = foundEmail.split('@');
         const masked = local[0] + '*'.repeat(Math.max(local.length - 1, 1)) + '@' + domain;
         setFindIdResult(masked);
@@ -155,7 +160,7 @@ export function LoginPage() {
           <div className="flex items-center justify-center gap-3 mt-4 text-sm">
             <button
               type="button"
-              onClick={() => { setFindIdOpen(true); setFindIdNickname(''); setFindIdResult(null); setFindIdError(''); }}
+              onClick={() => { setFindIdOpen(true); setFindIdValue(''); setFindIdResult(null); setFindIdError(''); setFindIdMethod('nickname'); }}
               className="text-warm-500 hover:text-warm-700 transition-colors cursor-pointer"
             >
               아이디 찾기
@@ -206,42 +211,71 @@ export function LoginPage() {
       <Modal isOpen={findIdOpen} onClose={() => setFindIdOpen(false)} title="아이디 찾기">
         <form onSubmit={handleFindId} className="space-y-4">
           <p className="text-sm text-warm-500">
-            회원가입 시 등록한 닉네임을 입력하면 가입된 이메일을 확인할 수 있습니다.
+            닉네임 또는 휴대폰 번호로 가입된 이메일을 찾을 수 있습니다.
           </p>
+          {/* 검색 방법 선택 */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => { setFindIdMethod('nickname'); setFindIdValue(''); setFindIdError(''); setFindIdResult(null); }}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors cursor-pointer ${findIdMethod === 'nickname' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-warm-600 border-warm-300 hover:bg-warm-50'}`}
+            >
+              닉네임으로 찾기
+            </button>
+            <button
+              type="button"
+              onClick={() => { setFindIdMethod('phone'); setFindIdValue(''); setFindIdError(''); setFindIdResult(null); }}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg border transition-colors cursor-pointer ${findIdMethod === 'phone' ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-warm-600 border-warm-300 hover:bg-warm-50'}`}
+            >
+              휴대폰으로 찾기
+            </button>
+          </div>
           {findIdError && (
             <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3">
               {findIdError}
             </div>
           )}
           {findIdResult ? (
-            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-lg px-4 py-4 text-center">
-              <p className="mb-1">등록된 이메일을 찾았습니다.</p>
-              <p className="text-lg font-bold">{findIdResult}</p>
-            </div>
+            <>
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm rounded-lg px-4 py-4 text-center">
+                <p className="mb-1">등록된 이메일을 찾았습니다.</p>
+                <p className="text-lg font-bold">{findIdResult}</p>
+              </div>
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => setFindIdOpen(false)}
+              >
+                로그인으로 돌아가기
+              </Button>
+            </>
           ) : (
             <>
-              <Input
-                id="find-nickname"
-                label="닉네임"
-                type="text"
-                placeholder="닉네임을 입력하세요"
-                value={findIdNickname}
-                onChange={(e) => setFindIdNickname(e.target.value)}
-                required
-              />
+              {findIdMethod === 'nickname' ? (
+                <Input
+                  id="find-nickname"
+                  label="닉네임"
+                  type="text"
+                  placeholder="닉네임을 입력하세요"
+                  value={findIdValue}
+                  onChange={(e) => setFindIdValue(e.target.value)}
+                  required
+                />
+              ) : (
+                <Input
+                  id="find-phone"
+                  label="휴대폰 번호"
+                  type="tel"
+                  placeholder="010-0000-0000"
+                  value={findIdValue}
+                  onChange={(e) => setFindIdValue(e.target.value)}
+                  required
+                />
+              )}
               <Button type="submit" className="w-full" disabled={findIdLoading}>
                 {findIdLoading ? '검색 중...' : '아이디 찾기'}
               </Button>
             </>
-          )}
-          {findIdResult && (
-            <Button
-              type="button"
-              className="w-full"
-              onClick={() => { setFindIdOpen(false); setEmail(findIdResult.includes('*') ? '' : findIdResult); }}
-            >
-              로그인으로 돌아가기
-            </Button>
           )}
         </form>
       </Modal>

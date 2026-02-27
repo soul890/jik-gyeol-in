@@ -18,6 +18,7 @@ export interface UserProfile {
   nickname: string;
   address: string;
   email: string;
+  phone?: string;
   role?: 'admin' | 'user';
   subscription?: Subscription;
   usage?: UsageTracking;
@@ -27,7 +28,7 @@ interface AuthContextValue {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
-  signup: (email: string, password: string, nickname: string, address: string) => Promise<void>;
+  signup: (email: string, password: string, nickname: string, address: string, phone?: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
@@ -76,9 +77,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  async function signup(email: string, password: string, nickname: string, address: string) {
+  async function signup(email: string, password: string, nickname: string, address: string, phone?: string) {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
-    const userProfile: UserProfile = { nickname, address, email };
+    const userProfile: UserProfile = { nickname, address, email, ...(phone ? { phone } : {}) };
     await setDoc(doc(db, 'users', cred.user.uid), userProfile);
     setProfile(userProfile);
     await sendEmailVerification(cred.user).catch(() => {});

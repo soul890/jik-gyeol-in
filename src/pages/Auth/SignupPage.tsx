@@ -13,6 +13,7 @@ export function SignupPage() {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -40,7 +41,7 @@ export function SignupPage() {
 
     setSubmitting(true);
     try {
-      await signup(email, password, nickname.trim(), address.trim());
+      await signup(email, password, nickname.trim(), address.trim(), phone.trim() || undefined);
       navigate('/');
     } catch (err) {
       const code = (err as { code?: string }).code;
@@ -113,6 +114,14 @@ export function SignupPage() {
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
               required
+            />
+            <Input
+              id="phone"
+              label="휴대폰 번호"
+              type="tel"
+              placeholder="010-0000-0000"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
             />
             <Input
               id="address"
