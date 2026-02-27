@@ -103,7 +103,7 @@ export function PostWritePage() {
             <div>
               <label className="block text-sm font-medium text-warm-700 mb-2">내용</label>
               <div className="border border-warm-200 rounded-lg p-4 bg-white min-h-[200px]">
-                <BlockEditor blocks={blocks} onChange={setBlocks} postId={postId} />
+                <BlockEditor blocks={blocks} onChange={setBlocks} storagePath={`communityPosts/${postId}/images`} />
               </div>
               <p className="text-xs text-warm-400 mt-2">
                 블록 사이의 + 버튼으로 텍스트, 사진, 구분선을 추가할 수 있습니다.

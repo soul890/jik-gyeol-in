@@ -23,6 +23,7 @@ export interface Job {
   views: number;
   isUrgent?: boolean;
   images?: string[];
+  blocks?: Block[];
   uid?: string;
 }
 
@@ -53,6 +54,7 @@ export interface Company {
   createdAt: string;
   portfolioImages?: string[];
   businessLicenseUrl?: string;
+  blocks?: Block[];
   reviews?: Review[];
   uid?: string;
 }
@@ -72,6 +74,7 @@ export interface Supplier {
   deliveryInfo: string;
   createdAt: string;
   images?: string[];
+  blocks?: Block[];
   uid?: string;
 }
 

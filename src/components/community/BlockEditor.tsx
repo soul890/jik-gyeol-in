@@ -7,7 +7,7 @@ import type { Block } from '@/types';
 interface BlockEditorProps {
   blocks: Block[];
   onChange: (blocks: Block[]) => void;
-  postId: string;
+  storagePath: string;
 }
 
 function AutoResizeTextarea({
@@ -79,7 +79,7 @@ function AddBlockBar({ onAdd }: { onAdd: (type: 'text' | 'image' | 'divider') =>
   );
 }
 
-export function BlockEditor({ blocks, onChange, postId }: BlockEditorProps) {
+export function BlockEditor({ blocks, onChange, storagePath }: BlockEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const insertIndexRef = useRef<number>(0);
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
@@ -123,7 +123,7 @@ export function BlockEditor({ blocks, onChange, postId }: BlockEditorProps) {
     setUploadingIndex(insertAt);
 
     try {
-      const storageRef = ref(storage, `communityPosts/${postId}/images/${Date.now()}_${file.name}`);
+      const storageRef = ref(storage, `${storagePath}/${Date.now()}_${file.name}`);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
 

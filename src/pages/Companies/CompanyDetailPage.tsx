@@ -1,10 +1,14 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { MapPin, Users, Calendar, Briefcase, X, MessageCircle, Star, Flag, Phone, Mail, ChevronLeft, ChevronRight, Grid2x2 } from 'lucide-react';
-import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
+import { MapPin, Users, Calendar, Briefcase, X, MessageCircle, Star, Flag, Phone, Mail, ChevronLeft, ChevronRight, Grid2x2, User, Send, Trash2 } from 'lucide-react';
+import {
+  doc, getDoc, updateDoc, increment,
+  collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, deleteDoc,
+} from 'firebase/firestore';
 import { categories } from '@/data/categories';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { BlockRenderer } from '@/components/community/BlockRenderer';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginPromptModal } from '@/components/LoginPromptModal';
@@ -12,7 +16,7 @@ import { ReportModal } from '@/components/ReportModal';
 import { ReviewFormModal } from '@/components/ReviewFormModal';
 import { findOrCreateChatRoom } from '@/utils/chat';
 import { formatDate } from '@/utils/format';
-import type { Company, Review } from '@/types';
+import type { Company, Review, CommunityComment } from '@/types';
 
 function ReviewItem({ review }: { review: Review }) {
   return (
@@ -67,6 +71,10 @@ export function CompanyDetailPage() {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
 
+  const [comments, setComments] = useState<CommunityComment[]>([]);
+  const [commentText, setCommentText] = useState('');
+  const [commentLoading, setCommentLoading] = useState(false);
+
   const fetchCompany = (incrementView = false) => {
     if (!id) return;
     const docRef = doc(db, 'companies', id);
@@ -90,6 +98,66 @@ export function CompanyDetailPage() {
     }
     fetchCompany(true);
   }, [id]);
+
+  // Subscribe to comments
+  useEffect(() => {
+    if (!id) return;
+    const commentsRef = collection(db, 'companies', id, 'comments');
+    const q = query(commentsRef, orderBy('createdAt', 'asc'));
+    const unsub = onSnapshot(q, (snap) => {
+      setComments(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as CommunityComment));
+    });
+    return unsub;
+  }, [id]);
+
+  const handleCommentSubmit = async () => {
+    if (!user || !id || !commentText.trim() || commentLoading) return;
+    setCommentLoading(true);
+    try {
+      await addDoc(collection(db, 'companies', id, 'comments'), {
+        text: commentText.trim(),
+        author: profile?.nickname || '익명',
+        uid: user.uid,
+        createdAt: serverTimestamp(),
+      });
+      await updateDoc(doc(db, 'companies', id), { commentCount: increment(1) });
+      setCommentText('');
+    } catch {
+      // silently fail
+    } finally {
+      setCommentLoading(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!id) return;
+    try {
+      await deleteDoc(doc(db, 'companies', id, 'comments', commentId));
+      await updateDoc(doc(db, 'companies', id), { commentCount: increment(-1) });
+    } catch {
+      // silently fail
+    }
+  };
+
+  const formatCommentDate = (createdAt: CommunityComment['createdAt']) => {
+    if (!createdAt) return '';
+    if (typeof createdAt === 'string') return formatDate(createdAt);
+    try {
+      const d = createdAt.toDate();
+      const now = new Date();
+      const diff = now.getTime() - d.getTime();
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return '방금 전';
+      if (mins < 60) return `${mins}분 전`;
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return `${hours}시간 전`;
+      const days = Math.floor(hours / 24);
+      if (days < 7) return `${days}일 전`;
+      return d.toLocaleDateString('ko-KR');
+    } catch {
+      return '';
+    }
+  };
 
   const isOwnListing = !!user && !!company?.uid && company.uid === user.uid;
 
@@ -288,7 +356,7 @@ export function CompanyDetailPage() {
             {/* 업체 소개 */}
             <div className="mb-8">
               <h2 className="text-xl font-semibold text-warm-900 mb-4">업체 소개</h2>
-              <p className="text-warm-600 leading-relaxed whitespace-pre-line">{company.description}</p>
+              <BlockRenderer blocks={company.blocks} content={company.description} />
             </div>
 
             {/* 포트폴리오 */}
@@ -344,6 +412,79 @@ export function CompanyDetailPage() {
                 </div>
               ) : (
                 <p className="text-sm text-warm-400 py-8">아직 후기가 없습니다</p>
+              )}
+            </div>
+
+            <hr className="border-warm-200 mb-8" />
+
+            {/* 댓글 섹션 */}
+            <div className="mb-8">
+              <h3 className="font-semibold text-warm-800 mb-4 flex items-center gap-2">
+                <MessageCircle className="w-5 h-5" />
+                댓글 {comments.length > 0 && <span className="text-primary-500">{comments.length}</span>}
+              </h3>
+
+              {comments.length > 0 ? (
+                <div className="space-y-4 mb-6">
+                  {comments.map((comment) => (
+                    <div key={comment.id} className="flex gap-3">
+                      <div className="w-8 h-8 rounded-full bg-warm-100 flex items-center justify-center shrink-0">
+                        <User className="w-4 h-4 text-warm-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-medium text-warm-700">{comment.author}</span>
+                          <span className="text-xs text-warm-400">{formatCommentDate(comment.createdAt)}</span>
+                          {user && comment.uid === user.uid && (
+                            <button
+                              onClick={() => handleDeleteComment(comment.id)}
+                              className="ml-auto text-warm-300 hover:text-red-500 transition-colors cursor-pointer"
+                              title="댓글 삭제"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-sm text-warm-600 leading-relaxed whitespace-pre-wrap">{comment.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 text-sm text-warm-400 mb-4">
+                  아직 댓글이 없습니다
+                </div>
+              )}
+
+              {user ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleCommentSubmit();
+                      }
+                    }}
+                    placeholder="댓글을 입력하세요..."
+                    className="flex-1 px-4 py-2.5 border border-warm-200 rounded-lg text-sm text-warm-700 placeholder:text-warm-300 focus:outline-none focus:border-primary-400 transition-colors"
+                  />
+                  <button
+                    onClick={handleCommentSubmit}
+                    disabled={!commentText.trim() || commentLoading}
+                    className="px-4 py-2.5 bg-primary-500 hover:bg-primary-600 disabled:bg-warm-200 text-white disabled:text-warm-400 rounded-lg transition-colors cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center py-3">
+                  <Link to="/login" className="text-sm text-primary-500 hover:text-primary-600 transition-colors">
+                    로그인 후 댓글을 작성할 수 있습니다
+                  </Link>
+                </div>
               )}
             </div>
           </div>

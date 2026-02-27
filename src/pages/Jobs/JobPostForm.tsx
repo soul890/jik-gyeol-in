@@ -1,17 +1,17 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
-import { FileUpload } from '@/components/ui/FileUpload';
+import { BlockEditor } from '@/components/community/BlockEditor';
 import { categories } from '@/data/categories';
 import { Modal } from '@/components/ui/Modal';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
+import type { Block } from '@/types';
 
 export function JobPostForm() {
   const navigate = useNavigate();
@@ -23,9 +23,10 @@ export function JobPostForm() {
     title: '',
     location: '',
     pay: '',
-    description: '',
     contact: '',
   });
+  const [blocks, setBlocks] = useState<Block[]>([{ type: 'text', value: '' }]);
+  const jobId = useMemo(() => crypto.randomUUID(), []);
 
   const categoryOptions = [
     { value: '', label: '공정을 선택하세요' },
@@ -35,13 +36,25 @@ export function JobPostForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const images = blocks
+        .filter((b): b is Extract<Block, { type: 'image' }> => b.type === 'image' && !!b.url)
+        .map((b) => b.url);
+      const description = blocks
+        .filter((b): b is Extract<Block, { type: 'text' }> => b.type === 'text')
+        .map((b) => b.value)
+        .join('\n');
+
       await addDoc(collection(db, 'jobs'), {
         ...formData,
+        description,
+        blocks,
+        images,
         uid: user?.uid || '',
         author: profile?.nickname || '익명',
         createdAt: serverTimestamp(),
         views: 0,
         isUrgent: false,
+        commentCount: 0,
       });
       setShowSuccess(true);
     } catch {
@@ -104,24 +117,15 @@ export function JobPostForm() {
               onChange={(e) => setFormData((f) => ({ ...f, pay: e.target.value }))}
             />
 
-            <Textarea
-              id="description"
-              label="상세 내용"
-              placeholder="작업 내용, 기간, 자격 요건 등을 자세히 적어주세요"
-              rows={8}
-              value={formData.description}
-              onChange={(e) => setFormData((f) => ({ ...f, description: e.target.value }))}
-            />
-
-            <FileUpload
-              label="사진 첨부 (선택)"
-              accept="image/*"
-              multiple
-              maxFiles={5}
-            />
-            <p className="text-xs text-warm-400 -mt-3">
-              현장 사진, 시공 사례, 자격증 등을 첨부하면 신뢰도가 높아집니다. (최대 5장)
-            </p>
+            <div>
+              <label className="block text-sm font-medium text-warm-700 mb-2">상세 내용</label>
+              <div className="border border-warm-200 rounded-lg p-4 bg-white min-h-[200px]">
+                <BlockEditor blocks={blocks} onChange={setBlocks} storagePath={`jobs/${jobId}/images`} />
+              </div>
+              <p className="text-xs text-warm-400 mt-2">
+                블록 사이의 + 버튼으로 텍스트, 사진, 구분선을 추가할 수 있습니다.
+              </p>
+            </div>
 
             <Input
               id="contact"

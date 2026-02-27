@@ -1,31 +1,29 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Modal } from '@/components/ui/Modal';
 import { FileUpload } from '@/components/ui/FileUpload';
+import { BlockEditor } from '@/components/community/BlockEditor';
 import { categories } from '@/data/categories';
 import { db, storage } from '@/lib/firebase';
 import { cn } from '@/utils/cn';
-import { useSubscription } from '@/hooks/useSubscription';
 import { useAuth } from '@/contexts/AuthContext';
+import type { Block } from '@/types';
 
 export function CompanyRegisterPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { maxPortfolioImages } = useSubscription();
   const [showSuccess, setShowSuccess] = useState(false);
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const [name, setName] = useState('');
-  const [desc, setDesc] = useState('');
   const [location, setLocation] = useState('');
   const [experience, setExperience] = useState('');
   const [employees, setEmployees] = useState('');
@@ -33,7 +31,8 @@ export function CompanyRegisterPage() {
   const [email, setEmail] = useState('');
 
   const [licenseFile, setLicenseFile] = useState<File[]>([]);
-  const [portfolioFiles, setPortfolioFiles] = useState<File[]>([]);
+  const [blocks, setBlocks] = useState<Block[]>([{ type: 'text', value: '' }]);
+  const companyId = useMemo(() => crypto.randomUUID(), []);
 
   const toggleCategory = (id: string) => {
     setSelectedCats((prev) =>
@@ -53,8 +52,6 @@ export function CompanyRegisterPage() {
     setSubmitting(true);
 
     try {
-      const companyId = crypto.randomUUID();
-
       let businessLicenseUrl = '';
       if (licenseFile.length > 0) {
         businessLicenseUrl = await uploadFile(
@@ -63,19 +60,19 @@ export function CompanyRegisterPage() {
         );
       }
 
-      const portfolioImageUrls: string[] = [];
-      for (const file of portfolioFiles) {
-        const url = await uploadFile(
-          file,
-          `companies/${companyId}/portfolio/${file.name}`,
-        );
-        portfolioImageUrls.push(url);
-      }
+      const portfolioImages = blocks
+        .filter((b): b is Extract<Block, { type: 'image' }> => b.type === 'image' && !!b.url)
+        .map((b) => b.url);
+      const description = blocks
+        .filter((b): b is Extract<Block, { type: 'text' }> => b.type === 'text')
+        .map((b) => b.value)
+        .join('\n');
 
       await addDoc(collection(db, 'companies'), {
         uid: user?.uid || '',
         name,
-        description: desc,
+        description,
+        blocks,
         categories: selectedCats,
         location,
         experience,
@@ -85,8 +82,9 @@ export function CompanyRegisterPage() {
         rating: 0,
         reviewCount: 0,
         portfolio: [],
-        portfolioImages: portfolioImageUrls,
+        portfolioImages,
         businessLicenseUrl,
+        commentCount: 0,
         createdAt: new Date().toISOString().split('T')[0],
       });
 
@@ -118,7 +116,15 @@ export function CompanyRegisterPage() {
 
             <Input id="name" label="업체명" placeholder="업체명을 입력하세요" value={name} onChange={(e) => setName(e.target.value)} required />
 
-            <Textarea id="desc" label="업체 소개" placeholder="업체를 소개해주세요" rows={4} value={desc} onChange={(e) => setDesc(e.target.value)} />
+            <div>
+              <label className="block text-sm font-medium text-warm-700 mb-2">업체 소개</label>
+              <div className="border border-warm-200 rounded-lg p-4 bg-white min-h-[200px]">
+                <BlockEditor blocks={blocks} onChange={setBlocks} storagePath={`companies/${companyId}/images`} />
+              </div>
+              <p className="text-xs text-warm-400 mt-2">
+                블록 사이의 + 버튼으로 텍스트, 사진, 구분선을 추가할 수 있습니다.
+              </p>
+            </div>
 
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-warm-700">전문 공정 (복수 선택)</label>
@@ -151,14 +157,6 @@ export function CompanyRegisterPage() {
               label="사업자등록증 (이미지 또는 PDF, 1개)"
               accept="image/*,.pdf"
               onChange={setLicenseFile}
-            />
-
-            <FileUpload
-              label={`시공 사례 사진 (최대 ${maxPortfolioImages}장)`}
-              accept="image/*"
-              multiple
-              maxFiles={maxPortfolioImages}
-              onChange={setPortfolioFiles}
             />
 
             <div className="flex gap-3 pt-4">
