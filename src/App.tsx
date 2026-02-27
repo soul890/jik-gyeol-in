@@ -3,37 +3,52 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
-const HomePage = lazy(() => import('@/pages/Home/HomePage').then((m) => ({ default: m.HomePage })));
-const JobBoardPage = lazy(() => import('@/pages/Jobs/JobBoardPage').then((m) => ({ default: m.JobBoardPage })));
-const JobDetailPage = lazy(() => import('@/pages/Jobs/JobDetailPage').then((m) => ({ default: m.JobDetailPage })));
-const JobPostForm = lazy(() => import('@/pages/Jobs/JobPostForm').then((m) => ({ default: m.JobPostForm })));
-const CompanyListPage = lazy(() => import('@/pages/Companies/CompanyListPage').then((m) => ({ default: m.CompanyListPage })));
-const CompanyDetailPage = lazy(() => import('@/pages/Companies/CompanyDetailPage').then((m) => ({ default: m.CompanyDetailPage })));
-const CompanyRegisterPage = lazy(() => import('@/pages/Companies/CompanyRegisterPage').then((m) => ({ default: m.CompanyRegisterPage })));
-const SupplierListPage = lazy(() => import('@/pages/Suppliers/SupplierListPage').then((m) => ({ default: m.SupplierListPage })));
-const SupplierDetailPage = lazy(() => import('@/pages/Suppliers/SupplierDetailPage').then((m) => ({ default: m.SupplierDetailPage })));
-const SupplierRegisterPage = lazy(() => import('@/pages/Suppliers/SupplierRegisterPage').then((m) => ({ default: m.SupplierRegisterPage })));
-const CommunityPage = lazy(() => import('@/pages/Community/CommunityPage').then((m) => ({ default: m.CommunityPage })));
-const PostDetailPage = lazy(() => import('@/pages/Community/PostDetailPage').then((m) => ({ default: m.PostDetailPage })));
-const PostWritePage = lazy(() => import('@/pages/Community/PostWritePage').then((m) => ({ default: m.PostWritePage })));
-const PricingPage = lazy(() => import('@/pages/Pricing/PricingPage').then((m) => ({ default: m.PricingPage })));
-const LoginPage = lazy(() => import('@/pages/Auth/LoginPage').then((m) => ({ default: m.LoginPage })));
-const SignupPage = lazy(() => import('@/pages/Auth/SignupPage').then((m) => ({ default: m.SignupPage })));
-const ExpertRegisterPage = lazy(() => import('@/pages/Experts/ExpertRegisterPage').then((m) => ({ default: m.ExpertRegisterPage })));
-const AIDesignPage = lazy(() => import('@/pages/AIDesign/AIDesignPage').then((m) => ({ default: m.AIDesignPage })));
-const CheckoutPage = lazy(() => import('@/pages/Payment/CheckoutPage').then((m) => ({ default: m.CheckoutPage })));
-const PaymentSuccessPage = lazy(() => import('@/pages/Payment/PaymentSuccessPage').then((m) => ({ default: m.PaymentSuccessPage })));
-const PaymentFailPage = lazy(() => import('@/pages/Payment/PaymentFailPage').then((m) => ({ default: m.PaymentFailPage })));
-const ChatListPage = lazy(() => import('@/pages/Chat/ChatListPage').then((m) => ({ default: m.ChatListPage })));
-const ChatRoomPage = lazy(() => import('@/pages/Chat/ChatRoomPage').then((m) => ({ default: m.ChatRoomPage })));
-const MyPage = lazy(() => import('@/pages/MyPage/MyPage').then((m) => ({ default: m.MyPage })));
-const SearchPage = lazy(() => import('@/pages/Search/SearchPage').then((m) => ({ default: m.SearchPage })));
-const AdminPage = lazy(() => import('@/pages/Admin/AdminPage').then((m) => ({ default: m.AdminPage })));
-const TermsPage = lazy(() => import('@/pages/Legal/TermsPage').then((m) => ({ default: m.TermsPage })));
-const PrivacyPage = lazy(() => import('@/pages/Legal/PrivacyPage').then((m) => ({ default: m.PrivacyPage })));
-const AboutPage = lazy(() => import('@/pages/About/AboutPage').then((m) => ({ default: m.AboutPage })));
-const ContactPage = lazy(() => import('@/pages/Contact/ContactPage').then((m) => ({ default: m.ContactPage })));
-const NotFoundPage = lazy(() => import('@/pages/NotFound/NotFoundPage').then((m) => ({ default: m.NotFoundPage })));
+// 배포 후 청크 해시가 바뀌면 이전 청크 로드 실패 → 자동 새로고침
+function lazyLoad<T extends Record<string, unknown>>(
+  factory: () => Promise<T>,
+  pick: (m: T) => React.ComponentType,
+) {
+  return lazy(() =>
+    factory()
+      .then((m) => ({ default: pick(m) }))
+      .catch(() => {
+        window.location.reload();
+        return new Promise<never>(() => {}); // 새로고침 동안 대기
+      }),
+  );
+}
+
+const HomePage = lazyLoad(() => import('@/pages/Home/HomePage'), (m) => m.HomePage as React.ComponentType);
+const JobBoardPage = lazyLoad(() => import('@/pages/Jobs/JobBoardPage'), (m) => m.JobBoardPage as React.ComponentType);
+const JobDetailPage = lazyLoad(() => import('@/pages/Jobs/JobDetailPage'), (m) => m.JobDetailPage as React.ComponentType);
+const JobPostForm = lazyLoad(() => import('@/pages/Jobs/JobPostForm'), (m) => m.JobPostForm as React.ComponentType);
+const CompanyListPage = lazyLoad(() => import('@/pages/Companies/CompanyListPage'), (m) => m.CompanyListPage as React.ComponentType);
+const CompanyDetailPage = lazyLoad(() => import('@/pages/Companies/CompanyDetailPage'), (m) => m.CompanyDetailPage as React.ComponentType);
+const CompanyRegisterPage = lazyLoad(() => import('@/pages/Companies/CompanyRegisterPage'), (m) => m.CompanyRegisterPage as React.ComponentType);
+const SupplierListPage = lazyLoad(() => import('@/pages/Suppliers/SupplierListPage'), (m) => m.SupplierListPage as React.ComponentType);
+const SupplierDetailPage = lazyLoad(() => import('@/pages/Suppliers/SupplierDetailPage'), (m) => m.SupplierDetailPage as React.ComponentType);
+const SupplierRegisterPage = lazyLoad(() => import('@/pages/Suppliers/SupplierRegisterPage'), (m) => m.SupplierRegisterPage as React.ComponentType);
+const CommunityPage = lazyLoad(() => import('@/pages/Community/CommunityPage'), (m) => m.CommunityPage as React.ComponentType);
+const PostDetailPage = lazyLoad(() => import('@/pages/Community/PostDetailPage'), (m) => m.PostDetailPage as React.ComponentType);
+const PostWritePage = lazyLoad(() => import('@/pages/Community/PostWritePage'), (m) => m.PostWritePage as React.ComponentType);
+const PricingPage = lazyLoad(() => import('@/pages/Pricing/PricingPage'), (m) => m.PricingPage as React.ComponentType);
+const LoginPage = lazyLoad(() => import('@/pages/Auth/LoginPage'), (m) => m.LoginPage as React.ComponentType);
+const SignupPage = lazyLoad(() => import('@/pages/Auth/SignupPage'), (m) => m.SignupPage as React.ComponentType);
+const ExpertRegisterPage = lazyLoad(() => import('@/pages/Experts/ExpertRegisterPage'), (m) => m.ExpertRegisterPage as React.ComponentType);
+const AIDesignPage = lazyLoad(() => import('@/pages/AIDesign/AIDesignPage'), (m) => m.AIDesignPage as React.ComponentType);
+const CheckoutPage = lazyLoad(() => import('@/pages/Payment/CheckoutPage'), (m) => m.CheckoutPage as React.ComponentType);
+const PaymentSuccessPage = lazyLoad(() => import('@/pages/Payment/PaymentSuccessPage'), (m) => m.PaymentSuccessPage as React.ComponentType);
+const PaymentFailPage = lazyLoad(() => import('@/pages/Payment/PaymentFailPage'), (m) => m.PaymentFailPage as React.ComponentType);
+const ChatListPage = lazyLoad(() => import('@/pages/Chat/ChatListPage'), (m) => m.ChatListPage as React.ComponentType);
+const ChatRoomPage = lazyLoad(() => import('@/pages/Chat/ChatRoomPage'), (m) => m.ChatRoomPage as React.ComponentType);
+const MyPage = lazyLoad(() => import('@/pages/MyPage/MyPage'), (m) => m.MyPage as React.ComponentType);
+const SearchPage = lazyLoad(() => import('@/pages/Search/SearchPage'), (m) => m.SearchPage as React.ComponentType);
+const AdminPage = lazyLoad(() => import('@/pages/Admin/AdminPage'), (m) => m.AdminPage as React.ComponentType);
+const TermsPage = lazyLoad(() => import('@/pages/Legal/TermsPage'), (m) => m.TermsPage as React.ComponentType);
+const PrivacyPage = lazyLoad(() => import('@/pages/Legal/PrivacyPage'), (m) => m.PrivacyPage as React.ComponentType);
+const AboutPage = lazyLoad(() => import('@/pages/About/AboutPage'), (m) => m.AboutPage as React.ComponentType);
+const ContactPage = lazyLoad(() => import('@/pages/Contact/ContactPage'), (m) => m.ContactPage as React.ComponentType);
+const NotFoundPage = lazyLoad(() => import('@/pages/NotFound/NotFoundPage'), (m) => m.NotFoundPage as React.ComponentType);
 
 function PageLoader() {
   return (
