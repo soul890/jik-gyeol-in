@@ -52,22 +52,26 @@ export async function onRequestPost(context) {
     const imageBase64 = arrayBufferToBase64(imageBuffer);
     const imageMimeType = imageFile.type || 'image/jpeg';
 
-    // Collect optional material images
+    // Collect optional material images (ceiling, floor, wall)
     const materialParts = [];
-    for (const [key, value] of formData.entries()) {
-      if (key === 'materialImages' && value instanceof File && value.size > 0) {
-        const buf = await value.arrayBuffer();
+    const materialLabels = [];
+    for (const [label, fieldName] of [['천장', 'ceilingImage'], ['바닥', 'floorImage'], ['벽체', 'wallImage']]) {
+      const file = formData.get(fieldName);
+      if (file && file instanceof File && file.size > 0) {
+        const buf = await file.arrayBuffer();
+        materialParts.push({ text: `[${label} 마감재 참고 사진]` });
         materialParts.push({
           inlineData: {
-            mimeType: value.type || 'image/jpeg',
+            mimeType: file.type || 'image/jpeg',
             data: arrayBufferToBase64(buf),
           },
         });
+        materialLabels.push(label);
       }
     }
 
     // ── Step 1: Analyse the room with Gemini Flash ──────────────────
-    const analysisPrompt = buildAnalysisPrompt(style, roomType, description);
+    const analysisPrompt = buildAnalysisPrompt(style, roomType, description, materialLabels);
     const analysisResult = await callGemini(
       GEMINI_API_KEY,
       'gemini-2.5-flash',
@@ -91,7 +95,7 @@ export async function onRequestPost(context) {
     }
 
     // ── Step 2: Generate redesigned image ───────────────────────────
-    const generationPrompt = buildGenerationPrompt(style, roomType, description, analysis);
+    const generationPrompt = buildGenerationPrompt(style, roomType, description, analysis, materialLabels);
     const generatedImage = await callGeminiImageGeneration(
       GEMINI_API_KEY,
       [
@@ -196,11 +200,14 @@ function arrayBufferToBase64(buffer) {
   return btoa(binary);
 }
 
-function buildAnalysisPrompt(style, roomType, description) {
+function buildAnalysisPrompt(style, roomType, description, materialLabels) {
+  const materialNote = materialLabels.length > 0
+    ? `\n사용자가 첨부한 마감재 참고 사진: ${materialLabels.join(', ')} (해당 부위에 첨부된 마감재를 반드시 적용하세요)`
+    : '';
   return `당신은 전문 인테리어 디자이너입니다.
 첨부된 사진은 현재 ${roomType}의 모습입니다.
 사용자가 원하는 스타일: ${style}
-추가 요청사항: ${description || '없음'}
+추가 요청사항: ${description || '없음'}${materialNote}
 
 현재 방을 분석하고, 요청된 스타일로 변환하기 위한 변경 사항을 JSON 형식으로 답변하세요.
 
@@ -212,8 +219,11 @@ function buildAnalysisPrompt(style, roomType, description) {
 }`;
 }
 
-function buildGenerationPrompt(style, roomType, description, analysis) {
+function buildGenerationPrompt(style, roomType, description, analysis, materialLabels) {
   const changesText = analysis.changes?.join(', ') || '';
+  const materialNote = materialLabels.length > 0
+    ? `\n- 첨부된 마감재 참고 사진(${materialLabels.join(', ')})의 질감, 색상, 패턴을 해당 부위에 정확히 반영하세요`
+    : '';
   return `이 ${roomType} 사진의 구조(벽, 바닥, 천장, 창문, 문 위치)를 정확히 유지하면서, ${style} 스타일로 인테리어를 변경한 실사 수준의 고품질 사진을 생성하세요.
 
 적용할 변경 사항: ${changesText}
@@ -224,7 +234,7 @@ ${analysis.estimatedMaterials?.length ? `사용할 자재: ${analysis.estimatedM
 - 방의 구조와 비율을 절대 변경하지 마세요
 - 실사 사진처럼 자연스러운 조명과 그림자를 적용하세요
 - 가구와 소품을 스타일에 맞게 배치하세요
-- 인테리어 잡지에 실릴 수준의 완성도를 목표로 하세요`;
+- 인테리어 잡지에 실릴 수준의 완성도를 목표로 하세요${materialNote}`;
 }
 
 async function callGemini(apiKey, model, parts) {

@@ -59,7 +59,9 @@ export function AIDesignPage() {
   const [selectedStyle, setSelectedStyle] = useState('모던');
   const [roomType, setRoomType] = useState('거실');
   const [description, setDescription] = useState('');
-  const [materialFiles, setMaterialFiles] = useState<File[]>([]);
+  const [ceilingFile, setCeilingFile] = useState<File | null>(null);
+  const [floorFile, setFloorFile] = useState<File | null>(null);
+  const [wallFile, setWallFile] = useState<File | null>(null);
 
   // Step 3 — results
   const [loading, setLoading] = useState(false);
@@ -112,9 +114,9 @@ export function AIDesignPage() {
       formData.append('roomType', roomType);
       formData.append('description', description);
 
-      for (const file of materialFiles) {
-        formData.append('materialImages', file);
-      }
+      if (ceilingFile) formData.append('ceilingImage', ceilingFile);
+      if (floorFile) formData.append('floorImage', floorFile);
+      if (wallFile) formData.append('wallImage', wallFile);
 
       const idToken = await user!.getIdToken();
       const res = await fetch('/api/interior-design', {
@@ -185,7 +187,9 @@ export function AIDesignPage() {
     setSelectedStyle('모던');
     setRoomType('거실');
     setDescription('');
-    setMaterialFiles([]);
+    setCeilingFile(null);
+    setFloorFile(null);
+    setWallFile(null);
     setGeneratedImage('');
     setAnalysis(null);
     setError('');
@@ -389,21 +393,71 @@ export function AIDesignPage() {
               />
             </div>
 
-            {/* Material images */}
+            {/* Material images - 3 separate slots */}
             <div>
               <h2 className="text-lg font-semibold text-warm-800 mb-1">
-                마감재 사진
+                마감재 디자인 사진
                 <span className="text-sm font-normal text-warm-400 ml-2">선택</span>
               </h2>
-              <p className="text-sm text-warm-500 mb-3">
-                적용하고 싶은 바닥재, 벽지, 타일 등의 사진을 업로드하세요.
+              <p className="text-sm text-warm-500 mb-4">
+                적용하고 싶은 천장, 바닥, 벽체 마감재 사진을 각각 업로드하세요.
               </p>
-              <FileUpload
-                accept="image/*"
-                multiple
-                maxFiles={3}
-                onChange={setMaterialFiles}
-              />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* 천장 */}
+                <div>
+                  <p className="text-sm font-medium text-warm-700 mb-2">천장</p>
+                  {ceilingFile ? (
+                    <div className="relative rounded-lg overflow-hidden border border-warm-200 aspect-square">
+                      <img src={URL.createObjectURL(ceilingFile)} alt="천장 마감재" className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => setCeilingFile(null)} className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center cursor-pointer">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center aspect-square rounded-lg border-2 border-dashed border-warm-300 hover:border-primary-400 bg-warm-50 hover:bg-primary-50/30 transition-colors cursor-pointer">
+                      <ImageIcon className="w-6 h-6 text-warm-400 mb-1" />
+                      <span className="text-xs text-warm-400">천장 마감재</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) setCeilingFile(e.target.files[0]); }} />
+                    </label>
+                  )}
+                </div>
+                {/* 바닥 */}
+                <div>
+                  <p className="text-sm font-medium text-warm-700 mb-2">바닥</p>
+                  {floorFile ? (
+                    <div className="relative rounded-lg overflow-hidden border border-warm-200 aspect-square">
+                      <img src={URL.createObjectURL(floorFile)} alt="바닥 마감재" className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => setFloorFile(null)} className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center cursor-pointer">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center aspect-square rounded-lg border-2 border-dashed border-warm-300 hover:border-primary-400 bg-warm-50 hover:bg-primary-50/30 transition-colors cursor-pointer">
+                      <ImageIcon className="w-6 h-6 text-warm-400 mb-1" />
+                      <span className="text-xs text-warm-400">바닥 마감재</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) setFloorFile(e.target.files[0]); }} />
+                    </label>
+                  )}
+                </div>
+                {/* 벽체 */}
+                <div>
+                  <p className="text-sm font-medium text-warm-700 mb-2">벽체</p>
+                  {wallFile ? (
+                    <div className="relative rounded-lg overflow-hidden border border-warm-200 aspect-square">
+                      <img src={URL.createObjectURL(wallFile)} alt="벽체 마감재" className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => setWallFile(null)} className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center cursor-pointer">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center aspect-square rounded-lg border-2 border-dashed border-warm-300 hover:border-primary-400 bg-warm-50 hover:bg-primary-50/30 transition-colors cursor-pointer">
+                      <ImageIcon className="w-6 h-6 text-warm-400 mb-1" />
+                      <span className="text-xs text-warm-400">벽체 마감재</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) setWallFile(e.target.files[0]); }} />
+                    </label>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Actions */}
