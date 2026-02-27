@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { SectionHeader } from '@/components/common/SectionHeader';
 import { db } from '@/lib/firebase';
+import { formatDate } from '@/utils/format';
 import type { CommunityPost } from '@/types';
 
 export function RecentCommunity() {
@@ -22,7 +23,15 @@ export function RecentCommunity() {
 
   const recentPosts = useMemo(() => {
     return [...firestorePosts]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort((a, b) => {
+        const getTime = (v: unknown): number => {
+          if (!v) return 0;
+          if (typeof v === 'string') return new Date(v).getTime();
+          if (typeof v === 'object' && v !== null && 'seconds' in v) return (v as { seconds: number }).seconds * 1000;
+          return 0;
+        };
+        return getTime(b.createdAt) - getTime(a.createdAt);
+      })
       .slice(0, 3);
   }, [firestorePosts]);
 
@@ -61,7 +70,7 @@ export function RecentCommunity() {
               <div className="flex items-center gap-2 text-xs text-warm-400">
                 <span>{post.author}</span>
                 <span>·</span>
-                <span>{post.createdAt}</span>
+                <span>{formatDate(post.createdAt)}</span>
               </div>
             </div>
           </Link>

@@ -1,5 +1,19 @@
-export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
+export function formatDate(dateInput: string | { toDate?: () => Date; seconds?: number } | null | undefined): string {
+  if (!dateInput) return '';
+
+  let date: Date;
+  if (typeof dateInput === 'string') {
+    date = new Date(dateInput);
+  } else if (typeof dateInput === 'object' && 'toDate' in dateInput && typeof dateInput.toDate === 'function') {
+    date = dateInput.toDate();
+  } else if (typeof dateInput === 'object' && 'seconds' in dateInput && typeof dateInput.seconds === 'number') {
+    date = new Date(dateInput.seconds * 1000);
+  } else {
+    return '';
+  }
+
+  if (isNaN(date.getTime())) return '';
+
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const minutes = Math.floor(diff / 60000);
