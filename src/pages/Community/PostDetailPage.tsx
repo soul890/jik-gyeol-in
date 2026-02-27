@@ -124,8 +124,9 @@ export function PostDetailPage() {
         commentCount: increment(1),
       });
       setCommentText('');
-    } catch {
-      // silently fail
+    } catch (err) {
+      console.error('댓글 등록 실패:', err);
+      alert('댓글 등록에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setCommentLoading(false);
     }
