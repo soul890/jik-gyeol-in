@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User, Sparkles, MessageCircle, Search } from 'lucide-react';
+import { Menu, X, LogOut, User, Sparkles, MessageCircle, Search, Bell } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
-import { useUnreadCount } from '@/hooks/useUnreadCount';
+import { useNotifications } from '@/hooks/useNotifications';
 import { cn } from '@/utils/cn';
+import { formatDate } from '@/utils/format';
 
 const navItems = [
   { path: '/', label: '홈' },
@@ -21,10 +22,11 @@ export function Header() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { user, profile, loading, logout } = useAuth();
   const { isPro } = useSubscription();
-  const unreadCount = useUnreadCount();
+  const { notifications, unreadCount } = useNotifications();
 
   const handleLogout = async () => {
     await logout();
@@ -116,17 +118,74 @@ export function Header() {
                     </span>
                   )}
                 </Link>
+                {/* 알림 */}
+                <div className="relative">
+                  <button
+                    onClick={() => setNotifOpen(!notifOpen)}
+                    className="relative p-2 rounded-lg text-warm-500 hover:text-warm-700 hover:bg-warm-100 transition-colors cursor-pointer"
+                  >
+                    <Bell className="w-4.5 h-4.5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-accent text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {notifOpen && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
+                      <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-lg border border-warm-200 z-50 overflow-hidden">
+                        <div className="px-4 py-3 border-b border-warm-100 flex items-center justify-between">
+                          <h3 className="font-semibold text-warm-800 text-sm">알림</h3>
+                          {notifications.length > 0 && (
+                            <Link
+                              to="/chat"
+                              onClick={() => setNotifOpen(false)}
+                              className="text-xs text-primary-500 hover:text-primary-600"
+                            >
+                              모두 보기
+                            </Link>
+                          )}
+                        </div>
+                        <div className="max-h-80 overflow-y-auto">
+                          {notifications.length === 0 ? (
+                            <div className="px-4 py-8 text-center text-sm text-warm-400">
+                              새로운 알림이 없습니다
+                            </div>
+                          ) : (
+                            notifications.map((n) => (
+                              <Link
+                                key={n.id}
+                                to={n.link}
+                                onClick={() => setNotifOpen(false)}
+                                className="block px-4 py-3 hover:bg-warm-50 border-b border-warm-50 transition-colors"
+                              >
+                                <div className="flex items-start gap-2">
+                                  <MessageCircle className="w-4 h-4 text-primary-500 mt-0.5 shrink-0" />
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-medium text-warm-800">{n.title}</p>
+                                    <p className="text-xs text-warm-500 truncate">{n.message}</p>
+                                    {n.createdAt && (
+                                      <p className="text-xs text-warm-400 mt-0.5">{formatDate(n.createdAt)}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </Link>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
                 <Link
                   to="/chat"
                   className="relative flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-warm-600 hover:text-warm-800 hover:bg-warm-100 transition-colors"
                 >
                   <MessageCircle className="w-4 h-4" />
                   채팅
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                  )}
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -231,8 +290,8 @@ export function Header() {
                     <MessageCircle className="w-4 h-4" />
                     채팅
                     {unreadCount > 0 && (
-                      <span className="ml-auto w-5 h-5 bg-accent text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                        {unreadCount > 9 ? '9+' : unreadCount}
+                      <span className="ml-auto px-2 py-0.5 bg-accent text-white text-[10px] font-bold rounded-full">
+                        {unreadCount > 9 ? '9+' : `${unreadCount}개 새 메시지`}
                       </span>
                     )}
                   </Link>
