@@ -1,6 +1,0 @@
-name = "openinterior"
-compatibility_date = "2024-09-23"
-pages_build_output_dir = "dist"
-
-# GEMINI_API_KEY는 Cloudflare 대시보드 > Settings > Environment Variables에서 시크릿으로 등록하세요.
-# 로컬 개발 시에는 .dev.vars 파일에 GEMINI_API_KEY=값 형태로 넣으세요 (.gitignore에 포함됨).
